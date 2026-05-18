@@ -4,12 +4,12 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { QRCodeSVG } from 'qrcode.react'
 
-export default function VerifyPage() {
+function VerifyContent() {
 
   const searchParams = useSearchParams()
 
@@ -77,5 +77,23 @@ export default function VerifyPage() {
       </div>
 
     </div>
+  )
+}
+
+export default function VerifyPage() {
+
+  return (
+
+    <Suspense
+      fallback={
+        <div className="p-10">
+          Loading...
+        </div>
+      }
+    >
+
+      <VerifyContent />
+
+    </Suspense>
   )
 }
