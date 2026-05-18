@@ -1,5 +1,3 @@
-// app/page.tsx
-
 'use client'
 
 import { useState } from 'react'
@@ -8,27 +6,25 @@ import { supabase } from '@/lib/supabase'
 export default function Home() {
 
   const [vin, setVin] = useState('')
-
   const [result, setResult] = useState<any>(null)
-
   const [notFound, setNotFound] = useState(false)
 
   const checkWarranty = async () => {
 
     setNotFound(false)
-
     setResult(null)
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('warranties')
       .select('*')
       .eq('vin', vin)
       .single()
 
+    console.log(data)
+    console.log(error)
+
     if (!data) {
-
       setNotFound(true)
-
       return
     }
 
@@ -36,7 +32,6 @@ export default function Home() {
   }
 
   return (
-
     <div className="p-10">
 
       <h1 className="text-5xl font-bold mb-10">
@@ -63,34 +58,27 @@ export default function Home() {
       </div>
 
       {notFound && (
-
         <p className="text-2xl text-red-500">
           Warranty not found
         </p>
-
       )}
 
       {result && (
-
-        <div className="text-2xl">
+        <div className="text-2xl space-y-4">
 
           <p>
-            <strong>Customer:</strong>{' '}
-            {result.customer_name}
+            <strong>Customer:</strong> {result.customer_name}
           </p>
 
           <p>
-            <strong>VIN:</strong>{' '}
-            {result.vin}
+            <strong>VIN:</strong> {result.vin}
           </p>
 
           <p>
-            <strong>Status:</strong>{' '}
-            {result.status}
+            <strong>Status:</strong> {result.status}
           </p>
 
         </div>
-
       )}
 
     </div>
