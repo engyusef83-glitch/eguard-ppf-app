@@ -11,11 +11,30 @@ export default function AdminPage() {
   const [vin, setVin] =
     useState('')
 
-  const [durationYears, setDurationYears] =
-    useState(5)
+  const [products, setProducts] =
+    useState<any[]>([])
+
+  const [selectedProduct, setSelectedProduct] =
+    useState('')
 
   const [warranties, setWarranties] =
     useState<any[]>([])
+
+  const fetchProducts = async () => {
+
+    const { data } = await supabase
+      .from('products')
+      .select('*')
+
+    if (data) {
+
+      setProducts(data)
+
+      if (data.length > 0) {
+        setSelectedProduct(data[0].id)
+      }
+    }
+  }
 
   const fetchWarranties = async () => {
 
@@ -50,12 +69,27 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
+
+    fetchProducts()
+
     fetchWarranties()
+
   }, [])
 
   const addWarranty = async () => {
 
-    if (!customerName || !vin) return
+    if (
+      !customerName ||
+      !vin ||
+      !selectedProduct
+    ) return
+
+    const product =
+      products.find(
+        (p) => p.id === selectedProduct
+      )
+
+    if (!product) return
 
     const startDate =
       new Date()
@@ -65,7 +99,7 @@ export default function AdminPage() {
 
     endDate.setFullYear(
       startDate.getFullYear() +
-      durationYears
+      product.warranty_years
     )
 
     await supabase
@@ -77,8 +111,11 @@ export default function AdminPage() {
 
           vin: vin,
 
+          product_name:
+            product.name,
+
           duration_years:
-            durationYears,
+            product.warranty_years,
 
           start_date:
             startDate
@@ -97,7 +134,6 @@ export default function AdminPage() {
 
     setCustomerName('')
     setVin('')
-    setDurationYears(5)
 
     fetchWarranties()
   }
@@ -148,32 +184,32 @@ export default function AdminPage() {
         />
 
         <select
-          value={durationYears}
+          value={selectedProduct}
           onChange={(e) =>
-            setDurationYears(
-              Number(
-                e.target.value
-              )
+            setSelectedProduct(
+              e.target.value
             )
           }
           className="border p-4 w-full text-xl"
         >
 
-          <option value={3}>
-            3 Years
-          </option>
+          {products.map((product) => (
 
-          <option value={5}>
-            5 Years
-          </option>
+            <option
+              key={product.id}
+              value={product.id}
+            >
 
-          <option value={7}>
-            7 Years
-          </option>
+              {product.name}
+              {' '}
+              (
+              {product.warranty_years}
+              {' '}
+              Years)
 
-          <option value={10}>
-            10 Years
-          </option>
+            </option>
+
+          ))}
 
         </select>
 
@@ -203,6 +239,12 @@ export default function AdminPage() {
               VIN:
               {' '}
               {item.vin}
+            </p>
+
+            <p>
+              Product:
+              {' '}
+              {item.product_name}
             </p>
 
             <p>
