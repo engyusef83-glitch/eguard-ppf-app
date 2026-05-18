@@ -6,25 +6,29 @@ import { supabase } from '@/lib/supabase'
 export default function Home() {
 
   const [vin, setVin] = useState('')
-  const [result, setResult] = useState<any>(null)
-  const [notFound, setNotFound] = useState(false)
+
+  const [result, setResult] =
+    useState<any>(null)
+
+  const [notFound, setNotFound] =
+    useState(false)
 
   const checkWarranty = async () => {
 
     setNotFound(false)
+
     setResult(null)
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('warranties')
       .select('*')
       .eq('vin', vin)
       .single()
 
-    console.log(data)
-    console.log(error)
-
     if (!data) {
+
       setNotFound(true)
+
       return
     }
 
@@ -32,6 +36,7 @@ export default function Home() {
   }
 
   return (
+
     <div className="p-10">
 
       <h1 className="text-5xl font-bold mb-10">
@@ -44,7 +49,9 @@ export default function Home() {
           type="text"
           placeholder="Enter VIN"
           value={vin}
-          onChange={(e) => setVin(e.target.value)}
+          onChange={(e) =>
+            setVin(e.target.value)
+          }
           className="border p-4 text-2xl"
         />
 
@@ -58,27 +65,63 @@ export default function Home() {
       </div>
 
       {notFound && (
+
         <p className="text-2xl text-red-500">
           Warranty not found
         </p>
+
       )}
 
       {result && (
-        <div className="text-2xl space-y-4">
+
+        <div className="border p-8 rounded-xl text-2xl space-y-4">
 
           <p>
-            <strong>Customer:</strong> {result.customer_name}
+            <strong>Customer:</strong>
+            {' '}
+            {result.customer_name}
           </p>
 
           <p>
-            <strong>VIN:</strong> {result.vin}
+            <strong>VIN:</strong>
+            {' '}
+            {result.vin}
           </p>
 
           <p>
-            <strong>Status:</strong> {result.status}
+            <strong>Product:</strong>
+            {' '}
+            {result.product_name}
+          </p>
+
+          <p>
+            <strong>Warranty:</strong>
+            {' '}
+            {result.duration_years}
+            {' '}
+            Years
+          </p>
+
+          <p>
+            <strong>Start Date:</strong>
+            {' '}
+            {result.start_date}
+          </p>
+
+          <p>
+            <strong>End Date:</strong>
+            {' '}
+            {result.end_date}
+          </p>
+
+          <p>
+            <strong>Status:</strong>
+            {' '}
+            {result.status}
           </p>
 
         </div>
+
       )}
 
     </div>
