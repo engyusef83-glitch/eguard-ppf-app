@@ -10,6 +10,7 @@ import { QRCodeSVG } from 'qrcode.react'
 export default function VerifyPage() {
 
   const searchParams = useSearchParams()
+
   const vin = searchParams.get('vin')
 
   const [data, setData] = useState<any>(null)
@@ -67,7 +68,7 @@ export default function VerifyPage() {
       <div className="mt-6">
 
         <QRCodeSVG
-          value={window.location.href}
+          value={`https://eguard-ppf-app.vercel.app/verify?vin=${data.vin}`}
           size={200}
         />
 
