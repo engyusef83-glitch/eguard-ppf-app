@@ -1,3 +1,5 @@
+// app/admin/page.tsx
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -31,6 +33,7 @@ export default function AdminPage() {
       setProducts(data)
 
       if (data.length > 0) {
+
         setSelectedProduct(data[0].id)
       }
     }
@@ -102,37 +105,50 @@ export default function AdminPage() {
       product.warranty_years
     )
 
-    await supabase
-      .from('warranties')
-      .insert([
-        {
-          customer_name:
-            customerName,
+    const { data, error } =
+      await supabase
+        .from('warranties')
+        .insert([
+          {
+            customer_name:
+              customerName,
 
-          vin: vin,
+            vin: vin,
 
-          product_name:
-            product.name,
+            product_name:
+              product.name,
 
-          duration_years:
-            product.warranty_years,
+            duration_years:
+              product.warranty_years,
 
-          start_date:
-            startDate
-              .toISOString()
-              .split('T')[0],
+            start_date:
+              startDate
+                .toISOString()
+                .split('T')[0],
 
-          end_date:
-            endDate
-              .toISOString()
-              .split('T')[0],
+            end_date:
+              endDate
+                .toISOString()
+                .split('T')[0],
 
-          status:
-            'Active',
-        },
-      ])
+            status:
+              'Active',
+          },
+        ])
+
+    console.log(data)
+
+    console.log(error)
+
+    if (error) {
+
+      alert(error.message)
+
+      return
+    }
 
     setCustomerName('')
+
     setVin('')
 
     fetchWarranties()
