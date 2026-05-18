@@ -19,11 +19,14 @@ export default function Home() {
 
     setResult(null)
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('warranties')
       .select('*')
       .eq('vin', vin)
       .maybeSingle()
+
+    console.log(data)
+    console.log(error)
 
     if (!data) {
 
