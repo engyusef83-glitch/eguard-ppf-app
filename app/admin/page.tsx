@@ -1,120 +1,97 @@
+// app/admin/page.tsx
+
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export default function AdminPage() {
 
-  const [installations, setInstallations] = useState<any[]>([])
+  const [customerName, setCustomerName] =
+    useState('')
 
-  useEffect(() => {
-    loadInstallations()
-  }, [])
+  const [vin, setVin] = useState('')
 
-  const loadInstallations = async () => {
+  const [status, setStatus] =
+    useState('Active')
 
-    const { data, error } = await supabase
-      .from('installations')
-      .select('*')
-      .order('created_at', {
-        ascending: false,
-      })
+  const addWarranty = async () => {
 
-    if (!error && data) {
-      setInstallations(data)
+    const { error } = await supabase
+      .from('warranties')
+      .insert([
+        {
+          customer_name: customerName,
+          vin,
+          status,
+        },
+      ])
+
+    if (error) {
+
+      alert('Error adding warranty')
+
+    } else {
+
+      alert('Warranty added')
+
+      setCustomerName('')
+      setVin('')
     }
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <div className="p-10">
 
-      <div className="max-w-7xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+      <h1 className="text-3xl font-bold mb-4">
+        Admin Dashboard
+      </h1>
 
-        <h1 className="text-3xl font-bold mb-6">
-          Eguard Warranty Dashboard
-        </h1>
+      <input
+        type="text"
+        placeholder="Customer Name"
+        value={customerName}
+        onChange={(e) =>
+          setCustomerName(e.target.value)
+        }
+        className="border p-2 block mb-4"
+      />
 
-        <div className="overflow-x-auto">
+      <input
+        type="text"
+        placeholder="VIN"
+        value={vin}
+        onChange={(e) =>
+          setVin(e.target.value)
+        }
+        className="border p-2 block mb-4"
+      />
 
-          <table className="w-full border-collapse">
+      <select
+        value={status}
+        onChange={(e) =>
+          setStatus(e.target.value)
+        }
+        className="border p-2 block mb-4"
+      >
 
-            <thead>
+        <option>
+          Active
+        </option>
 
-              <tr className="bg-black text-white">
+        <option>
+          Expired
+        </option>
 
-                <th className="p-3 text-left">
-                  Roll ID
-                </th>
+      </select>
 
-                <th className="p-3 text-left">
-                  VIN
-                </th>
+      <button
+        onClick={addWarranty}
+        className="bg-black text-white px-4 py-2"
+      >
+        Add Warranty
+      </button>
 
-                <th className="p-3 text-left">
-                  Film Type
-                </th>
-
-                <th className="p-3 text-left">
-                  Warranty
-                </th>
-
-                <th className="p-3 text-left">
-                  Location
-                </th>
-
-                <th className="p-3 text-left">
-                  Install Date
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {installations.map((item) => (
-
-                <tr
-                  key={item.id}
-                  className="border-b"
-                >
-
-                  <td className="p-3">
-                    {item.film_roll_id}
-                  </td>
-
-                  <td className="p-3">
-                    {item.vin_number}
-                  </td>
-
-                  <td className="p-3">
-                    {item.film_type}
-                  </td>
-
-                  <td className="p-3">
-                    {item.warranty_years} Years
-                  </td>
-
-                  <td className="p-3">
-                    {item.installation_location}
-                  </td>
-
-                  <td className="p-3">
-                    {item.install_date}
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-    </main>
+    </div>
   )
 }
