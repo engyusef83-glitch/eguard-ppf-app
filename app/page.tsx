@@ -23,7 +23,7 @@ export default function Home() {
       .from('warranties')
       .select('*')
       .eq('vin', vin)
-      .single()
+      .maybeSingle()
 
     if (!data) {
 
