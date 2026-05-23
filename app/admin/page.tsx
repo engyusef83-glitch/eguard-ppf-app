@@ -1,312 +1,72 @@
-// app/admin/page.tsx
+"use client";
 
-'use client'
+import { useEffect, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function AdminPage() {
+  const router = useRouter();
 
-  const [customerName, setCustomerName] =
-    useState('')
-
-  const [vin, setVin] =
-    useState('')
-
-  const [products, setProducts] =
-    useState<any[]>([])
-
-  const [selectedProduct, setSelectedProduct] =
-    useState('')
-
-  const [warranties, setWarranties] =
-    useState<any[]>([])
-
-  const fetchProducts = async () => {
-
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-
-    if (data) {
-
-      setProducts(data)
-
-      if (data.length > 0) {
-
-        setSelectedProduct(data[0].id)
-      }
-    }
-  }
-
-  const fetchWarranties = async () => {
-
-    const { data } = await supabase
-      .from('warranties')
-      .select('*')
-      .order('start_date', {
-        ascending: false,
-      })
-
-    if (data) {
-
-      const updated = data.map((item) => {
-
-        const today =
-          new Date()
-
-        const end =
-          new Date(item.end_date)
-
-        return {
-          ...item,
-          status:
-            end < today
-              ? 'Expired'
-              : 'Active',
-        }
-      })
-
-      setWarranties(updated)
-    }
-  }
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    checkUser();
+  }, []);
 
-    fetchProducts()
+  async function checkUser() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    fetchWarranties()
-
-  }, [])
-
-  const addWarranty = async () => {
-
-    if (
-      !customerName ||
-      !vin ||
-      !selectedProduct
-    ) return
-
-    const product =
-      products.find(
-        (p) => p.id === selectedProduct
-      )
-
-    if (!product) return
-
-    const startDate =
-      new Date()
-
-    const endDate =
-      new Date()
-
-    endDate.setFullYear(
-      startDate.getFullYear() +
-      product.warranty_years
-    )
-
-    const { data, error } =
-      await supabase
-        .from('warranties')
-        .insert([
-          {
-            customer_name:
-              customerName,
-
-            vin: vin,
-
-            product_name:
-              product.name,
-
-            duration_years:
-              product.warranty_years,
-
-            start_date:
-              startDate
-                .toISOString()
-                .split('T')[0],
-
-            end_date:
-              endDate
-                .toISOString()
-                .split('T')[0],
-
-            status:
-              'Active',
-          },
-        ])
-
-    console.log(data)
-
-    console.log(error)
-
-    if (error) {
-
-      alert(error.message)
-
-      return
+    if (!session) {
+      router.push("/login");
+      return;
     }
 
-    setCustomerName('')
-
-    setVin('')
-
-    fetchWarranties()
+    setLoading(false);
   }
 
-  const deleteWarranty =
-    async (id: string) => {
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
 
-      await supabase
-        .from('warranties')
-        .delete()
-        .eq('id', id)
-
-      fetchWarranties()
-    }
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
 
   return (
-
-    <div className="p-10">
-
-      <h1 className="text-5xl font-bold mb-10">
-        Admin Dashboard
-      </h1>
-
-      <div className="space-y-4 max-w-xl mb-10">
-
-        <input
-          type="text"
-          placeholder="Customer Name"
-          value={customerName}
-          onChange={(e) =>
-            setCustomerName(
-              e.target.value
-            )
-          }
-          className="border p-4 w-full text-xl"
-        />
-
-        <input
-          type="text"
-          placeholder="VIN"
-          value={vin}
-          onChange={(e) =>
-            setVin(
-              e.target.value
-            )
-          }
-          className="border p-4 w-full text-xl"
-        />
-
-        <select
-          value={selectedProduct}
-          onChange={(e) =>
-            setSelectedProduct(
-              e.target.value
-            )
-          }
-          className="border p-4 w-full text-xl"
-        >
-
-          {products.map((product) => (
-
-            <option
-              key={product.id}
-              value={product.id}
-            >
-
-              {product.name}
-              {' '}
-              (
-              {product.warranty_years}
-              {' '}
-              Years)
-
-            </option>
-
-          ))}
-
-        </select>
+    <div style={{ padding: "40px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+        }}
+      >
+        <h1>Admin Dashboard</h1>
 
         <button
-          onClick={addWarranty}
-          className="bg-black text-white px-8 py-4 text-xl"
+          onClick={handleLogout}
+          style={{
+            background: "red",
+            color: "white",
+            border: "none",
+            padding: "12px 20px",
+            cursor: "pointer",
+          }}
         >
-          Add Warranty
+          Logout
         </button>
-
       </div>
 
-      <div className="space-y-4">
-
-        {warranties.map((item) => (
-
-          <div
-            key={item.id}
-            className="border p-6 rounded-xl"
-          >
-
-            <p className="text-2xl font-bold">
-              {item.customer_name}
-            </p>
-
-            <p>
-              VIN:
-              {' '}
-              {item.vin}
-            </p>
-
-            <p>
-              Product:
-              {' '}
-              {item.product_name}
-            </p>
-
-            <p>
-              Warranty:
-              {' '}
-              {item.duration_years}
-              {' '}
-              Years
-            </p>
-
-            <p>
-              Start Date:
-              {' '}
-              {item.start_date}
-            </p>
-
-            <p>
-              End Date:
-              {' '}
-              {item.end_date}
-            </p>
-
-            <p>
-              Status:
-              {' '}
-              <strong>
-                {item.status}
-              </strong>
-            </p>
-
-            <button
-              onClick={() =>
-                deleteWarranty(
-                  item.id
-                )
-              }
-              className="bg-red-500 text-white px-4 py-2 mt-4"
-            >
-              Delete
-            </button>
-
-          </div>
-        ))}
-
-      </div>
-
+      <p>Admin protected page works ✅</p>
     </div>
-  )
+  );
 }
