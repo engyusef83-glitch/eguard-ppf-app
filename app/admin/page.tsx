@@ -14,7 +14,7 @@ type Warranty = {
   customer_name: string;
   vin: string;
   product_name: string;
-  warranty_years: number;
+  duration_years: number;
   start_date: string;
   end_date: string;
   status: string;
@@ -30,17 +30,13 @@ export default function AdminPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-
-  const [customerName, setCustomerName] =
-    useState("");
-
+  const [customerName, setCustomerName] = useState("");
   const [vin, setVin] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState(
+    products[0].name
+  );
 
-  const [selectedProduct, setSelectedProduct] =
-    useState(products[0].name);
-
-  const [warranties, setWarranties] =
-    useState<Warranty[]>([]);
+  const [warranties, setWarranties] = useState<Warranty[]>([]);
 
   useEffect(() => {
     checkUser();
@@ -57,7 +53,6 @@ export default function AdminPage() {
     }
 
     setLoading(false);
-
     loadWarranties();
   }
 
@@ -65,9 +60,7 @@ export default function AdminPage() {
     const { data, error } = await supabase
       .from("warranties")
       .select("*")
-      .order("id", {
-        ascending: false,
-      });
+      .order("id", { ascending: false });
 
     console.log(data);
     console.log(error);
@@ -77,7 +70,6 @@ export default function AdminPage() {
 
   async function handleLogout() {
     await supabase.auth.signOut();
-
     router.push("/login");
   }
 
@@ -89,50 +81,33 @@ export default function AdminPage() {
     if (!product) return;
 
     const startDate = new Date();
-
     const endDate = new Date();
 
     endDate.setFullYear(
-      startDate.getFullYear() +
-        product.years
+      startDate.getFullYear() + product.years
     );
 
-    const start =
-      startDate
-        .toISOString()
-        .split("T")[0];
+    const start = startDate
+      .toISOString()
+      .split("T")[0];
 
-    const end =
-      endDate
-        .toISOString()
-        .split("T")[0];
+    const end = endDate
+      .toISOString()
+      .split("T")[0];
 
-    const { error } =
-      await supabase
-        .from("warranties")
-        .insert([
-          {
-            customer_name:
-              customerName,
-
-            vin: vin,
-
-            product_name:
-              product.name,
-
-            warranty_years:
-              product.years,
-
-            start_date:
-              start,
-
-            end_date:
-              end,
-
-            status:
-              "Active",
-          },
-        ]);
+    const { error } = await supabase
+      .from("warranties")
+      .insert([
+        {
+          customer_name: customerName,
+          vin: vin,
+          product_name: product.name,
+          duration_years: product.years,
+          start_date: start,
+          end_date: end,
+          status: "Active",
+        },
+      ]);
 
     console.log(error);
 
@@ -142,15 +117,12 @@ export default function AdminPage() {
     }
 
     setCustomerName("");
-
     setVin("");
 
     await loadWarranties();
   }
 
-  async function deleteWarranty(
-    id: number
-  ) {
+  async function deleteWarranty(id: number) {
     await supabase
       .from("warranties")
       .delete()
@@ -168,8 +140,7 @@ export default function AdminPage() {
       <div
         style={{
           display: "flex",
-          justifyContent:
-            "space-between",
+          justifyContent: "space-between",
           alignItems: "center",
         }}
       >
@@ -187,8 +158,7 @@ export default function AdminPage() {
             background: "red",
             color: "white",
             border: "none",
-            padding:
-              "12px 20px",
+            padding: "12px 20px",
             cursor: "pointer",
           }}
         >
@@ -207,15 +177,12 @@ export default function AdminPage() {
           placeholder="Customer Name"
           value={customerName}
           onChange={(e) =>
-            setCustomerName(
-              e.target.value
-            )
+            setCustomerName(e.target.value)
           }
           style={{
             width: "100%",
             padding: "20px",
-            marginBottom:
-              "20px",
+            marginBottom: "20px",
             fontSize: "20px",
           }}
         />
@@ -225,68 +192,45 @@ export default function AdminPage() {
           placeholder="VIN"
           value={vin}
           onChange={(e) =>
-            setVin(
-              e.target.value
-            )
+            setVin(e.target.value)
           }
           style={{
             width: "100%",
             padding: "20px",
-            marginBottom:
-              "20px",
+            marginBottom: "20px",
             fontSize: "20px",
           }}
         />
 
         <select
-          value={
-            selectedProduct
-          }
+          value={selectedProduct}
           onChange={(e) =>
-            setSelectedProduct(
-              e.target.value
-            )
+            setSelectedProduct(e.target.value)
           }
           style={{
             width: "100%",
             padding: "20px",
-            marginBottom:
-              "20px",
+            marginBottom: "20px",
             fontSize: "20px",
           }}
         >
-          {products.map(
-            (product) => (
-              <option
-                key={
-                  product.name
-                }
-                value={
-                  product.name
-                }
-              >
-                {product.name}
-                {" - "}
-                {
-                  product.years
-                }{" "}
-                Years
-              </option>
-            )
-          )}
+          {products.map((product) => (
+            <option
+              key={product.name}
+              value={product.name}
+            >
+              {product.name} - {product.years} Years
+            </option>
+          ))}
         </select>
 
         <button
-          onClick={
-            addWarranty
-          }
+          onClick={addWarranty}
           style={{
-            background:
-              "black",
+            background: "black",
             color: "white",
             border: "none",
-            padding:
-              "16px 30px",
+            padding: "16px 30px",
             cursor: "pointer",
             fontSize: "20px",
           }}
@@ -295,88 +239,54 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {warranties.map(
-        (item) => (
-          <div
-            key={item.id}
+      {warranties.map((item) => (
+        <div
+          key={item.id}
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: "10px",
+            padding: "20px",
+            marginBottom: "20px",
+          }}
+        >
+          <h2>{item.customer_name}</h2>
+
+          <p>VIN: {item.vin}</p>
+
+          <p>
+            Product: {item.product_name}
+          </p>
+
+          <p>
+            Warranty: {item.duration_years} Years
+          </p>
+
+          <p>
+            Start Date: {item.start_date}
+          </p>
+
+          <p>
+            End Date: {item.end_date}
+          </p>
+
+          <p>Status: {item.status}</p>
+
+          <button
+            onClick={() =>
+              deleteWarranty(item.id)
+            }
             style={{
-              border:
-                "1px solid #ddd",
-              borderRadius:
-                "10px",
-              padding:
-                "20px",
-              marginBottom:
-                "20px",
+              background: "red",
+              color: "white",
+              border: "none",
+              padding: "10px 16px",
+              cursor: "pointer",
             }}
           >
-            <h2>
-              {
-                item.customer_name
-              }
-            </h2>
-
-            <p>
-              VIN:{" "}
-              {item.vin}
-            </p>
-
-            <p>
-              Product:{" "}
-              {
-                item.product_name
-              }
-            </p>
-
-            <p>
-              Warranty:{" "}
-              {
-                item.warranty_years
-              }{" "}
-              Years
-            </p>
-
-            <p>
-              Start Date:{" "}
-              {
-                item.start_date
-              }
-            </p>
-
-            <p>
-              End Date:{" "}
-              {item.end_date}
-            </p>
-
-            <p>
-              Status:{" "}
-              {item.status}
-            </p>
-
-            <button
-              onClick={() =>
-                deleteWarranty(
-                  item.id
-                )
-              }
-              style={{
-                background:
-                  "red",
-                color:
-                  "white",
-                border:
-                  "none",
-                padding:
-                  "10px 16px",
-                cursor:
-                  "pointer",
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        )
-      )}
+            Delete
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
