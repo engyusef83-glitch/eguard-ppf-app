@@ -9,16 +9,27 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-type Warranty = {
-  id: number;
-  customer_name: string;
-  vin: string;
-  product_name: string;
-  duration_years: number;
-  start_date: string;
-  end_date: string;
-  status: string;
-};
+const governorates = [
+  "Baghdad",
+  "Basra",
+  "Nineveh",
+  "Erbil",
+  "Najaf",
+  "Karbala",
+  "Babil",
+  "Diyala",
+  "Dhi Qar",
+  "Al Anbar",
+  "Maysan",
+  "Muthanna",
+  "Wasit",
+  "Salah al-Din",
+  "Kirkuk",
+  "Sulaymaniyah",
+  "Dohuk",
+  "Qadisiyyah",
+  "Halabja",
+];
 
 const products = [
   { name: "PPF Bronze", years: 3 },
@@ -26,17 +37,50 @@ const products = [
   { name: "PPF Platinum", years: 7 },
 ];
 
+type Warranty = {
+  id: number;
+  customer_name: string;
+  vin: string;
+  roll_number: string;
+  country: string;
+  governorate: string;
+  city: string;
+  center_name: string;
+  product_name: string;
+  duration_years: number;
+  start_date: string;
+  end_date: string;
+  status: string;
+};
+
 export default function AdminPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-  const [customerName, setCustomerName] = useState("");
-  const [vin, setVin] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(
-    products[0].name
-  );
 
-  const [warranties, setWarranties] = useState<Warranty[]>([]);
+  const [customerName, setCustomerName] =
+    useState("");
+
+  const [vin, setVin] =
+    useState("");
+
+  const [rollNumber, setRollNumber] =
+    useState("");
+
+  const [governorate, setGovernorate] =
+    useState("Baghdad");
+
+  const [city, setCity] =
+    useState("");
+
+  const [centerName, setCenterName] =
+    useState("");
+
+  const [selectedProduct, setSelectedProduct] =
+    useState(products[0].name);
+
+  const [warranties, setWarranties] =
+    useState<Warranty[]>([]);
 
   useEffect(() => {
     checkUser();
@@ -52,18 +96,31 @@ export default function AdminPage() {
       return;
     }
 
+    await loadCenter(session.user.id);
+    await loadWarranties();
+
     setLoading(false);
-    loadWarranties();
+  }
+
+  async function loadCenter(userId: string) {
+    const { data } = await supabase
+      .from("centers")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
+    if (data) {
+      setCenterName(data.center_name);
+    }
   }
 
   async function loadWarranties() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("warranties")
       .select("*")
-      .order("id", { ascending: false });
-
-    console.log(data);
-    console.log(error);
+      .order("id", {
+        ascending: false,
+      });
 
     setWarranties(data || []);
   }
@@ -84,32 +141,60 @@ export default function AdminPage() {
     const endDate = new Date();
 
     endDate.setFullYear(
-      startDate.getFullYear() + product.years
+      startDate.getFullYear() +
+        product.years
     );
 
-    const start = startDate
-      .toISOString()
-      .split("T")[0];
+    const start =
+      startDate
+        .toISOString()
+        .split("T")[0];
 
-    const end = endDate
-      .toISOString()
-      .split("T")[0];
+    const end =
+      endDate
+        .toISOString()
+        .split("T")[0];
 
-    const { error } = await supabase
-      .from("warranties")
-      .insert([
-        {
-          customer_name: customerName,
-          vin: vin,
-          product_name: product.name,
-          duration_years: product.years,
-          start_date: start,
-          end_date: end,
-          status: "Active",
-        },
-      ]);
+    const { error } =
+      await supabase
+        .from("warranties")
+        .insert([
+          {
+            customer_name:
+              customerName,
 
-    console.log(error);
+            vin: vin,
+
+            roll_number:
+              rollNumber,
+
+            country:
+              "Iraq",
+
+            governorate:
+              governorate,
+
+            city: city,
+
+            center_name:
+              centerName,
+
+            product_name:
+              product.name,
+
+            duration_years:
+              product.years,
+
+            start_date:
+              start,
+
+            end_date:
+              end,
+
+            status:
+              "Active",
+          },
+        ]);
 
     if (error) {
       alert(error.message);
@@ -118,11 +203,15 @@ export default function AdminPage() {
 
     setCustomerName("");
     setVin("");
+    setRollNumber("");
+    setCity("");
 
     await loadWarranties();
   }
 
-  async function deleteWarranty(id: number) {
+  async function deleteWarranty(
+    id: number
+  ) {
     await supabase
       .from("warranties")
       .delete()
@@ -140,153 +229,232 @@ export default function AdminPage() {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent:
+            "space-between",
           alignItems: "center",
+          marginBottom: "30px",
         }}
       >
-        <h1
-          style={{
-            fontSize: "50px",
-          }}
-        >
+        <h1>
           Admin Dashboard
         </h1>
 
         <button
           onClick={handleLogout}
-          style={{
-            background: "red",
-            color: "white",
-            border: "none",
-            padding: "12px 20px",
-            cursor: "pointer",
-          }}
         >
           Logout
         </button>
       </div>
 
-      <div
-        style={{
-          marginTop: "30px",
-          marginBottom: "40px",
-        }}
+      <h3>
+        Center:
+        {" "}
+        {centerName}
+      </h3>
+
+      <input
+        type="text"
+        placeholder="Customer Name"
+        value={customerName}
+        onChange={(e) =>
+          setCustomerName(
+            e.target.value
+          )
+        }
+      />
+
+      <br />
+      <br />
+
+      <input
+        type="text"
+        placeholder="VIN"
+        value={vin}
+        onChange={(e) =>
+          setVin(
+            e.target.value
+          )
+        }
+      />
+
+      <br />
+      <br />
+
+      <input
+        type="text"
+        placeholder="Roll Number"
+        value={rollNumber}
+        onChange={(e) =>
+          setRollNumber(
+            e.target.value
+          )
+        }
+      />
+
+      <br />
+      <br />
+
+      <p>
+        Country: Iraq
+      </p>
+
+      <select
+        value={governorate}
+        onChange={(e) =>
+          setGovernorate(
+            e.target.value
+          )
+        }
       >
-        <input
-          type="text"
-          placeholder="Customer Name"
-          value={customerName}
-          onChange={(e) =>
-            setCustomerName(e.target.value)
-          }
-          style={{
-            width: "100%",
-            padding: "20px",
-            marginBottom: "20px",
-            fontSize: "20px",
-          }}
-        />
-
-        <input
-          type="text"
-          placeholder="VIN"
-          value={vin}
-          onChange={(e) =>
-            setVin(e.target.value)
-          }
-          style={{
-            width: "100%",
-            padding: "20px",
-            marginBottom: "20px",
-            fontSize: "20px",
-          }}
-        />
-
-        <select
-          value={selectedProduct}
-          onChange={(e) =>
-            setSelectedProduct(e.target.value)
-          }
-          style={{
-            width: "100%",
-            padding: "20px",
-            marginBottom: "20px",
-            fontSize: "20px",
-          }}
-        >
-          {products.map((product) => (
+        {governorates.map(
+          (gov) => (
             <option
-              key={product.name}
-              value={product.name}
+              key={gov}
+              value={gov}
             >
-              {product.name} - {product.years} Years
+              {gov}
             </option>
-          ))}
-        </select>
+          )
+        )}
+      </select>
 
-        <button
-          onClick={addWarranty}
-          style={{
-            background: "black",
-            color: "white",
-            border: "none",
-            padding: "16px 30px",
-            cursor: "pointer",
-            fontSize: "20px",
-          }}
-        >
-          Add Warranty
-        </button>
-      </div>
+      <br />
+      <br />
 
-      {warranties.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            padding: "20px",
-            marginBottom: "20px",
-          }}
-        >
-          <h2>{item.customer_name}</h2>
+      <input
+        type="text"
+        placeholder="City"
+        value={city}
+        onChange={(e) =>
+          setCity(
+            e.target.value
+          )
+        }
+      />
 
-          <p>VIN: {item.vin}</p>
+      <br />
+      <br />
 
-          <p>
-            Product: {item.product_name}
-          </p>
+      <select
+        value={
+          selectedProduct
+        }
+        onChange={(e) =>
+          setSelectedProduct(
+            e.target.value
+          )
+        }
+      >
+        {products.map(
+          (product) => (
+            <option
+              key={
+                product.name
+              }
+              value={
+                product.name
+              }
+            >
+              {product.name}
+              {" - "}
+              {
+                product.years
+              }{" "}
+              Years
+            </option>
+          )
+        )}
+      </select>
 
-          <p>
-            Warranty: {item.duration_years} Years
-          </p>
+      <br />
+      <br />
 
-          <p>
-            Start Date: {item.start_date}
-          </p>
+      <button
+        onClick={addWarranty}
+      >
+        Add Warranty
+      </button>
 
-          <p>
-            End Date: {item.end_date}
-          </p>
+      <hr />
 
-          <p>Status: {item.status}</p>
-
-          <button
-            onClick={() =>
-              deleteWarranty(item.id)
-            }
-            style={{
-              background: "red",
-              color: "white",
-              border: "none",
-              padding: "10px 16px",
-              cursor: "pointer",
-            }}
+      {warranties.map(
+        (item) => (
+          <div
+            key={item.id}
           >
-            Delete
-          </button>
-        </div>
-      ))}
+            <h3>
+              {
+                item.customer_name
+              }
+            </h3>
+
+            <p>
+              VIN:
+              {" "}
+              {item.vin}
+            </p>
+
+            <p>
+              Roll:
+              {" "}
+              {
+                item.roll_number
+              }
+            </p>
+
+            <p>
+              Center:
+              {" "}
+              {
+                item.center_name
+              }
+            </p>
+
+            <p>
+              Governorate:
+              {" "}
+              {
+                item.governorate
+              }
+            </p>
+
+            <p>
+              City:
+              {" "}
+              {item.city}
+            </p>
+
+            <p>
+              Product:
+              {" "}
+              {
+                item.product_name
+              }
+            </p>
+
+            <p>
+              Warranty:
+              {" "}
+              {
+                item.duration_years
+              }{" "}
+              Years
+            </p>
+
+            <button
+              onClick={() =>
+                deleteWarranty(
+                  item.id
+                )
+              }
+            >
+              Delete
+            </button>
+
+            <hr />
+          </div>
+        )
+      )}
     </div>
   );
 }
