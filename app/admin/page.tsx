@@ -82,6 +82,12 @@ export default function AdminPage() {
   const [warranties, setWarranties] =
     useState<Warranty[]>([]);
 
+  const [showVinScanner, setShowVinScanner] =
+    useState(false);
+
+  const [showRollScanner, setShowRollScanner] =
+    useState(false);
+
   useEffect(() => {
     checkUser();
   }, []);
@@ -263,6 +269,18 @@ export default function AdminPage() {
         }
       />
 
+      {showVinScanner && (
+        <div
+          style={{
+            border: "1px solid #ccc",
+            padding: "20px",
+            marginBottom: "20px",
+          }}
+        >
+          VIN Camera Preview
+        </div>
+      )}
+
       <br />
       <br />
 
@@ -289,7 +307,7 @@ export default function AdminPage() {
 
         <button
           onClick={() =>
-            alert("VIN Scanner")
+            setShowVinScanner(!showVinScanner)
           }
         >
           Scan VIN
@@ -322,7 +340,7 @@ export default function AdminPage() {
 
         <button
           onClick={() =>
-            alert("Roll Scanner")
+            setShowRollScanner(!showRollScanner)
           }
         >
           Scan Roll
@@ -331,6 +349,18 @@ export default function AdminPage() {
 
       <br />
       <br />
+
+      {showRollScanner && (
+        <div
+          style={{
+            border: "1px solid #ccc",
+            padding: "20px",
+            marginBottom: "20px",
+          }}
+        >
+          Roll Camera Preview
+        </div>
+      )}
 
       <p>
         Country: Iraq
