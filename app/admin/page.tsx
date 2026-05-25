@@ -325,7 +325,24 @@ export default function AdminPage() {
   }
 
   return (
-    <div style={{ padding: "30px" }}>
+    <div
+      style={{
+        background: "#f5f5f5",
+        minHeight: "100vh",
+        padding: "16px",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "700px",
+          margin: "0 auto",
+          background: "#fff",
+          borderRadius: "20px",
+          padding: "20px",
+          boxShadow:
+            "0 2px 10px rgba(0,0,0,0.08)",
+        }}
+      >
       <div
         style={{
           display: "flex",
@@ -355,6 +372,14 @@ export default function AdminPage() {
       <input
         type="text"
         placeholder="Customer Name"
+        style={{
+          width: "100%",
+          padding: "14px",
+          borderRadius: "12px",
+          border: "1px solid #ddd",
+          fontSize: "16px",
+          marginBottom: "16px",
+        }}
         value={customerName}
         onChange={(e) =>
           setCustomerName(
@@ -412,6 +437,10 @@ export default function AdminPage() {
           }
           style={{
             flex: 1,
+            padding: "14px",
+            borderRadius: "12px",
+            border: "1px solid #ddd",
+            fontSize: "16px",
           }}
         />
 
@@ -445,6 +474,10 @@ export default function AdminPage() {
           }
           style={{
             flex: 1,
+            padding: "14px",
+            borderRadius: "12px",
+            border: "1px solid #ddd",
+            fontSize: "16px",
           }}
         />
 
@@ -493,6 +526,13 @@ export default function AdminPage() {
       </p>
 
       <select
+        style={{
+          width: "100%",
+          padding: "14px",
+          borderRadius: "12px",
+          border: "1px solid #ddd",
+          fontSize: "16px",
+        }}
         value={governorate}
         onChange={(e) =>
           setGovernorate(
@@ -518,6 +558,13 @@ export default function AdminPage() {
       <input
         type="text"
         placeholder="City"
+        style={{
+          width: "100%",
+          padding: "14px",
+          borderRadius: "12px",
+          border: "1px solid #ddd",
+          fontSize: "16px",
+        }}
         value={city}
         onChange={(e) =>
           setCity(
@@ -530,6 +577,13 @@ export default function AdminPage() {
       <br />
 
       <select
+        style={{
+          width: "100%",
+          padding: "14px",
+          borderRadius: "12px",
+          border: "1px solid #ddd",
+          fontSize: "16px",
+        }}
         value={
           selectedProduct
         }
@@ -565,6 +619,13 @@ export default function AdminPage() {
 
       <button
         onClick={addWarranty}
+        style={{
+          width: "100%",
+          padding: "16px",
+          borderRadius: "12px",
+          fontSize: "18px",
+          fontWeight: "bold",
+        }}
       >
         Add Warranty
       </button>
@@ -649,6 +710,7 @@ export default function AdminPage() {
           </div>
         )
       )}
+          </div>
     </div>
   );
 }
