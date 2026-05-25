@@ -266,30 +266,68 @@ export default function AdminPage() {
       <br />
       <br />
 
-      <input
-        type="text"
-        placeholder="VIN"
-        value={vin}
-        onChange={(e) =>
-          setVin(
-            e.target.value
-          )
-        }
-      />
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          alignItems: "center",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="VIN"
+          value={vin}
+          onChange={(e) =>
+            setVin(
+              e.target.value
+            )
+          }
+          style={{
+            flex: 1,
+          }}
+        />
+
+        <button
+          onClick={() =>
+            alert("VIN Scanner")
+          }
+        >
+          Scan VIN
+        </button>
+      </div>
 
       <br />
       <br />
 
-      <input
-        type="text"
-        placeholder="Roll Number"
-        value={rollNumber}
-        onChange={(e) =>
-          setRollNumber(
-            e.target.value
-          )
-        }
-      />
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          alignItems: "center",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Roll Number"
+          value={rollNumber}
+          onChange={(e) =>
+            setRollNumber(
+              e.target.value
+            )
+          }
+          style={{
+            flex: 1,
+          }}
+        />
+
+        <button
+          onClick={() =>
+            alert("Roll Scanner")
+          }
+        >
+          Scan Roll
+        </button>
+      </div>
 
       <br />
       <br />
