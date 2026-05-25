@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Html5Qrcode } from "html5-qrcode";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
@@ -226,6 +227,76 @@ export default function AdminPage() {
     loadWarranties();
   }
 
+
+  async function startVinScanner() {
+    setShowVinScanner(true);
+
+    setTimeout(async () => {
+      try {
+        const scanner = new Html5Qrcode(
+          "vin-reader"
+        );
+
+        await scanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: 250,
+          },
+          async (decodedText) => {
+            setVin(decodedText);
+
+            await scanner.stop();
+
+            setShowVinScanner(
+              false
+            );
+          }
+        );
+      } catch (error) {
+        alert(
+          "Could not open camera"
+        );
+      }
+    }, 100);
+  }
+
+  async function startRollScanner() {
+    setShowRollScanner(true);
+
+    setTimeout(async () => {
+      try {
+        const scanner =
+          new Html5Qrcode(
+            "roll-reader"
+          );
+
+        await scanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: 250,
+          },
+          async (decodedText) => {
+            setRollNumber(
+              decodedText
+            );
+
+            await scanner.stop();
+
+            setShowRollScanner(
+              false
+            );
+          }
+        );
+      } catch (error) {
+        alert(
+          "Could not open camera"
+        );
+      }
+    }, 100);
+  }
+
   if (loading) {
     return <h1>Loading...</h1>;
   }
@@ -277,7 +348,7 @@ export default function AdminPage() {
             marginBottom: "20px",
           }}
         >
-          VIN Camera Preview
+          <div id="vin-reader"></div>
         </div>
       )}
 
@@ -307,7 +378,7 @@ export default function AdminPage() {
 
         <button
           onClick={() =>
-            setShowVinScanner(!showVinScanner)
+            startVinScanner()
           }
         >
           Scan VIN
@@ -340,7 +411,7 @@ export default function AdminPage() {
 
         <button
           onClick={() =>
-            setShowRollScanner(!showRollScanner)
+            startRollScanner()
           }
         >
           Scan Roll
@@ -358,7 +429,7 @@ export default function AdminPage() {
             marginBottom: "20px",
           }}
         >
-          Roll Camera Preview
+          <div id="roll-reader"></div>
         </div>
       )}
 
