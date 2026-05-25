@@ -229,6 +229,7 @@ export default function AdminPage() {
 
 
   async function startVinScanner() {
+    if (showVinScanner) return;
     setShowVinScanner(true);
 
     requestAnimationFrame(async () => {
@@ -273,6 +274,7 @@ export default function AdminPage() {
   }
 
   async function startRollScanner() {
+    if (showRollScanner) return;
     setShowRollScanner(true);
 
     requestAnimationFrame(async () => {
@@ -364,12 +366,28 @@ export default function AdminPage() {
       {showVinScanner && (
         <div
           style={{
-            border: "1px solid #ccc",
-            padding: "20px",
+            border: "2px solid #ddd",
+            borderRadius: "12px",
+            padding: "16px",
             marginBottom: "20px",
+            background: "#fafafa",
           }}
         >
+          <p>
+            Point camera to barcode or QR code
+          </p>
+
           <div id="vin-reader"></div>
+
+          <br />
+
+          <button
+            onClick={() =>
+              setShowVinScanner(false)
+            }
+          >
+            Close Scanner
+          </button>
         </div>
       )}
 
@@ -445,12 +463,28 @@ export default function AdminPage() {
       {showRollScanner && (
         <div
           style={{
-            border: "1px solid #ccc",
-            padding: "20px",
+            border: "2px solid #ddd",
+            borderRadius: "12px",
+            padding: "16px",
             marginBottom: "20px",
+            background: "#fafafa",
           }}
         >
+          <p>
+            Point camera to barcode or QR code
+          </p>
+
           <div id="roll-reader"></div>
+
+          <br />
+
+          <button
+            onClick={() =>
+              setShowRollScanner(false)
+            }
+          >
+            Close Scanner
+          </button>
         </div>
       )}
 
