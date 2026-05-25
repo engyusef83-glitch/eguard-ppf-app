@@ -260,13 +260,13 @@ export default function AdminPage() {
             setShowVinScanner(
               false
             );
-          }
+          },
+          () => {}
         );
-      } catch (error: any) {
+      } catch (error) {
         console.error(error);
-
         alert(
-          JSON.stringify(error)
+          "Camera failed to start"
         );
       }
     });
@@ -306,13 +306,13 @@ export default function AdminPage() {
             setShowRollScanner(
               false
             );
-          }
+          },
+          () => {}
         );
-      } catch (error: any) {
+      } catch (error) {
         console.error(error);
-
         alert(
-          JSON.stringify(error)
+          "Camera failed to start"
         );
       }
     });
