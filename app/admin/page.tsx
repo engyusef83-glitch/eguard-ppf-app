@@ -231,14 +231,23 @@ export default function AdminPage() {
   async function startVinScanner() {
     setShowVinScanner(true);
 
-    setTimeout(async () => {
+    requestAnimationFrame(async () => {
       try {
-        const scanner = new Html5Qrcode(
-          "vin-reader"
-        );
+        const cameras =
+          await Html5Qrcode.getCameras();
+
+        if (!cameras.length) {
+          alert("No camera found");
+          return;
+        }
+
+        const scanner =
+          new Html5Qrcode(
+            "vin-reader"
+          );
 
         await scanner.start(
-          { facingMode: "environment" },
+          cameras[0].id,
           {
             fps: 10,
             qrbox: 250,
@@ -254,25 +263,34 @@ export default function AdminPage() {
           }
         );
       } catch (error) {
+        console.error(error);
         alert(
-          "Could not open camera"
+          "Camera failed to start"
         );
       }
-    }, 100);
+    });
   }
 
   async function startRollScanner() {
     setShowRollScanner(true);
 
-    setTimeout(async () => {
+    requestAnimationFrame(async () => {
       try {
+        const cameras =
+          await Html5Qrcode.getCameras();
+
+        if (!cameras.length) {
+          alert("No camera found");
+          return;
+        }
+
         const scanner =
           new Html5Qrcode(
             "roll-reader"
           );
 
         await scanner.start(
-          { facingMode: "environment" },
+          cameras[0].id,
           {
             fps: 10,
             qrbox: 250,
@@ -290,11 +308,12 @@ export default function AdminPage() {
           }
         );
       } catch (error) {
+        console.error(error);
         alert(
-          "Could not open camera"
+          "Camera failed to start"
         );
       }
-    }, 100);
+    });
   }
 
   if (loading) {
