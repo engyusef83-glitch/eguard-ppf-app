@@ -233,6 +233,10 @@ export default function AdminPage() {
 
     requestAnimationFrame(async () => {
       try {
+        await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+
         const cameras =
           await Html5Qrcode.getCameras();
 
@@ -276,6 +280,10 @@ export default function AdminPage() {
 
     requestAnimationFrame(async () => {
       try {
+        await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+
         const cameras =
           await Html5Qrcode.getCameras();
 
