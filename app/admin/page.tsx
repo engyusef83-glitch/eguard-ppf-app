@@ -247,7 +247,7 @@ export default function AdminPage() {
           );
 
         await scanner.start(
-          cameras[0].id,
+          { facingMode: "environment" },
           {
             fps: 10,
             qrbox: 250,
@@ -291,7 +291,7 @@ export default function AdminPage() {
           );
 
         await scanner.start(
-          cameras[0].id,
+          { facingMode: "environment" },
           {
             fps: 10,
             qrbox: 250,
