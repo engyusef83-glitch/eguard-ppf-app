@@ -233,10 +233,6 @@ export default function AdminPage() {
 
     requestAnimationFrame(async () => {
       try {
-        await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-
         const cameras =
           await Html5Qrcode.getCameras();
 
@@ -266,10 +262,11 @@ export default function AdminPage() {
             );
           }
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
+
         alert(
-          "Camera failed to start"
+          JSON.stringify(error)
         );
       }
     });
@@ -280,10 +277,6 @@ export default function AdminPage() {
 
     requestAnimationFrame(async () => {
       try {
-        await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-
         const cameras =
           await Html5Qrcode.getCameras();
 
@@ -315,10 +308,11 @@ export default function AdminPage() {
             );
           }
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
+
         alert(
-          "Camera failed to start"
+          JSON.stringify(error)
         );
       }
     });
