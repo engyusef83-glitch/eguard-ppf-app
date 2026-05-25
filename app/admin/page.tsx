@@ -321,13 +321,13 @@ export default function AdminPage() {
   }
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    return <h1 style={{ color: "#fff" }}>Loading...</h1>;
   }
 
   return (
     <div
       style={{
-        background: "#f5f5f5",
+        background: "#0f0f0f",
         minHeight: "100vh",
         padding: "16px",
       }}
@@ -336,7 +336,7 @@ export default function AdminPage() {
         style={{
           maxWidth: "700px",
           margin: "0 auto",
-          background: "#fff",
+          background: "#181818",
           borderRadius: "20px",
           padding: "20px",
           boxShadow:
@@ -352,18 +352,19 @@ export default function AdminPage() {
           marginBottom: "30px",
         }}
       >
-        <h1>
+        <h1 style={{ color: "#fff" }}>
           Admin Dashboard
         </h1>
 
         <button
+          style={{ background:"#222", color:"#fff", borderRadius:"10px", padding:"10px" }}
           onClick={handleLogout}
         >
           Logout
         </button>
       </div>
 
-      <h3>
+      <h3 style={{ color: "#fff" }}>
         Center:
         {" "}
         {centerName}
@@ -376,8 +377,10 @@ export default function AdminPage() {
           width: "100%",
           padding: "14px",
           borderRadius: "12px",
-          border: "1px solid #ddd",
+          border: "1px solid #333",
           fontSize: "16px",
+          color: "#fff",
+          background: "#222",
           marginBottom: "16px",
         }}
         value={customerName}
@@ -391,14 +394,14 @@ export default function AdminPage() {
       {showVinScanner && (
         <div
           style={{
-            border: "2px solid #ddd",
+            border: "2px solid #333",
             borderRadius: "12px",
             padding: "16px",
             marginBottom: "20px",
-            background: "#fafafa",
+            background: "#202020",
           }}
         >
-          <p>
+          <p style={{ color: "#fff" }}>
             Point camera to barcode or QR code
           </p>
 
@@ -439,12 +442,15 @@ export default function AdminPage() {
             flex: 1,
             padding: "14px",
             borderRadius: "12px",
-            border: "1px solid #ddd",
+            border: "1px solid #333",
             fontSize: "16px",
+          color: "#fff",
+          background: "#222",
           }}
         />
 
         <button
+          style={{ background:"#333", color:"#fff", borderRadius:"10px", padding:"12px" }}
           onClick={() =>
             startVinScanner()
           }
@@ -476,12 +482,15 @@ export default function AdminPage() {
             flex: 1,
             padding: "14px",
             borderRadius: "12px",
-            border: "1px solid #ddd",
+            border: "1px solid #333",
             fontSize: "16px",
+          color: "#fff",
+          background: "#222",
           }}
         />
 
         <button
+          style={{ background:"#333", color:"#fff", borderRadius:"10px", padding:"12px" }}
           onClick={() =>
             startRollScanner()
           }
@@ -496,14 +505,14 @@ export default function AdminPage() {
       {showRollScanner && (
         <div
           style={{
-            border: "2px solid #ddd",
+            border: "2px solid #333",
             borderRadius: "12px",
             padding: "16px",
             marginBottom: "20px",
-            background: "#fafafa",
+            background: "#202020",
           }}
         >
-          <p>
+          <p style={{ color: "#fff" }}>
             Point camera to barcode or QR code
           </p>
 
@@ -521,7 +530,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      <p>
+      <p style={{ color: "#fff" }}>
         Country: Iraq
       </p>
 
@@ -530,8 +539,10 @@ export default function AdminPage() {
           width: "100%",
           padding: "14px",
           borderRadius: "12px",
-          border: "1px solid #ddd",
+          border: "1px solid #333",
           fontSize: "16px",
+          color: "#fff",
+          background: "#222",
         }}
         value={governorate}
         onChange={(e) =>
@@ -562,8 +573,10 @@ export default function AdminPage() {
           width: "100%",
           padding: "14px",
           borderRadius: "12px",
-          border: "1px solid #ddd",
+          border: "1px solid #333",
           fontSize: "16px",
+          color: "#fff",
+          background: "#222",
         }}
         value={city}
         onChange={(e) =>
@@ -581,8 +594,10 @@ export default function AdminPage() {
           width: "100%",
           padding: "14px",
           borderRadius: "12px",
-          border: "1px solid #ddd",
+          border: "1px solid #333",
           fontSize: "16px",
+          color: "#fff",
+          background: "#222",
         }}
         value={
           selectedProduct
@@ -625,6 +640,7 @@ export default function AdminPage() {
           borderRadius: "12px",
           fontSize: "18px",
           fontWeight: "bold",
+          background: "#fff",
         }}
       >
         Add Warranty
@@ -637,19 +653,19 @@ export default function AdminPage() {
           <div
             key={item.id}
           >
-            <h3>
+            <h3 style={{ color: "#fff" }}>
               {
                 item.customer_name
               }
             </h3>
 
-            <p>
+            <p style={{ color: "#fff" }}>
               VIN:
               {" "}
               {item.vin}
             </p>
 
-            <p>
+            <p style={{ color: "#fff" }}>
               Roll:
               {" "}
               {
@@ -657,7 +673,7 @@ export default function AdminPage() {
               }
             </p>
 
-            <p>
+            <p style={{ color: "#fff" }}>
               Center:
               {" "}
               {
@@ -665,7 +681,7 @@ export default function AdminPage() {
               }
             </p>
 
-            <p>
+            <p style={{ color: "#fff" }}>
               Governorate:
               {" "}
               {
@@ -673,13 +689,13 @@ export default function AdminPage() {
               }
             </p>
 
-            <p>
+            <p style={{ color: "#fff" }}>
               City:
               {" "}
               {item.city}
             </p>
 
-            <p>
+            <p style={{ color: "#fff" }}>
               Product:
               {" "}
               {
@@ -687,7 +703,7 @@ export default function AdminPage() {
               }
             </p>
 
-            <p>
+            <p style={{ color: "#fff" }}>
               Warranty:
               {" "}
               {
