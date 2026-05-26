@@ -867,8 +867,18 @@ export default function AdminPage() {
         (item) => (
           <div
             key={item.id}
+            style={{
+              background: "#202020",
+              border: "1px solid #333",
+              borderRadius: "16px",
+              padding: "18px",
+              marginBottom: "16px",
+            }}
           >
-            <h3 style={{ color: "#fff" }}>
+            <h3 style={{
+              color: "#fff",
+              marginBottom: "14px",
+            }}>
               {
                 item.customer_name
               }
@@ -928,6 +938,14 @@ export default function AdminPage() {
             </p>
 
             <button
+              style={{
+                background:"#7a1f1f",
+                color:"#fff",
+                border:"none",
+                borderRadius:"10px",
+                padding:"10px 16px",
+                marginTop:"10px",
+              }}
               onClick={() =>
                 deleteWarranty(
                   item.id
@@ -936,8 +954,6 @@ export default function AdminPage() {
             >
               Delete
             </button>
-
-            <hr />
           </div>
         )
       )}
