@@ -546,6 +546,14 @@ export default function AdminPage() {
         {centerName}
       </h3>
 
+      <h3 style={{ color:"#fff", marginBottom:"10px" }}>
+        Customer Information
+      </h3>
+
+      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
+        Customer Name
+      </label>
+
       <input
         type="text"
         placeholder={t.customer}
@@ -597,6 +605,22 @@ export default function AdminPage() {
 
       <br />
       <br />
+
+      <h3 style={{ color:"#fff", marginBottom:"10px", marginTop:"20px" }}>
+        Vehicle Information
+      </h3>
+
+      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
+        VIN
+      </label>
+
+      <h3 style={{ color:"#fff", marginBottom:"10px", marginTop:"20px" }}>
+        Roll Information
+      </h3>
+
+      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
+        Roll Number
+      </label>
 
       <div
         style={{
@@ -706,9 +730,25 @@ export default function AdminPage() {
         </div>
       )}
 
+      <h3 style={{ color:"#fff", marginTop:"20px" }}>
+        Location
+      </h3>
+
       <p style={{ color: "#fff" }}>
         {t.country}
       </p>
+
+      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
+        Governorate
+      </label>
+
+      <h3 style={{ color:"#fff", marginTop:"20px" }}>
+        Product
+      </h3>
+
+      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
+        Product Type
+      </label>
 
       <select
         style={{
@@ -741,6 +781,10 @@ export default function AdminPage() {
 
       <br />
       <br />
+
+      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
+        City
+      </label>
 
       <input
         type="text"
@@ -884,19 +928,34 @@ export default function AdminPage() {
               }
             </h3>
 
-            <p style={{ color: "#fff" }}>
-              VIN:
-              {" "}
-              {item.vin}
-            </p>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px,1fr))", gap:"10px" }}>
+              <div>
+                <p style={{ color:"#888", marginBottom:"4px" }}>VIN</p>
+                <p style={{ color:"#fff" }}>{item.vin}</p>
+              </div>
+              <div>
+                <p style={{ color:"#888", marginBottom:"4px" }}>Roll Number</p>
+                <p style={{ color:"#fff" }}>{item.roll_number}</p>
+              </div>
+              <div>
+                <p style={{ color:"#888", marginBottom:"4px" }}>Product</p>
+                <p style={{ color:"#fff" }}>{item.product_name}</p>
+              </div>
+              <div>
+                <p style={{ color:"#888", marginBottom:"4px" }}>Warranty</p>
+                <p style={{ color:"#fff" }}>{item.duration_years} Years</p>
+              </div>
+              <div>
+                <p style={{ color:"#888", marginBottom:"4px" }}>Governorate</p>
+                <p style={{ color:"#fff" }}>{item.governorate}</p>
+              </div>
+              <div>
+                <p style={{ color:"#888", marginBottom:"4px" }}>City</p>
+                <p style={{ color:"#fff" }}>{item.city}</p>
+              </div>
+            </div>
 
-            <p style={{ color: "#fff" }}>
-              Roll:
-              {" "}
-              {
-                item.roll_number
-              }
-            </p>
+
 
             <p style={{ color: "#fff" }}>
               {t.center}
@@ -906,36 +965,13 @@ export default function AdminPage() {
               }
             </p>
 
-            <p style={{ color: "#fff" }}>
-              Governorate:
-              {" "}
-              {
-                item.governorate
-              }
-            </p>
 
-            <p style={{ color: "#fff" }}>
-              City:
-              {" "}
-              {item.city}
-            </p>
 
-            <p style={{ color: "#fff" }}>
-              Product:
-              {" "}
-              {
-                item.product_name
-              }
-            </p>
 
-            <p style={{ color: "#fff" }}>
-              Warranty:
-              {" "}
-              {
-                item.duration_years
-              }{" "}
-              Years
-            </p>
+
+
+
+
 
             <button
               style={{
