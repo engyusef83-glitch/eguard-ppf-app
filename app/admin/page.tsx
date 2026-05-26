@@ -475,6 +475,71 @@ export default function AdminPage() {
         </button>
       </div>
 
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: "12px",
+          marginBottom: "20px",
+        }}
+      >
+        <div
+          style={{
+            background: "#202020",
+            border: "1px solid #333",
+            borderRadius: "14px",
+            padding: "16px",
+          }}
+        >
+          <p style={{ color:"#aaa" }}>
+            Total Warranties
+          </p>
+          <h2 style={{ color:"#fff" }}>
+            {warranties.length}
+          </h2>
+        </div>
+
+        <div
+          style={{
+            background: "#202020",
+            border: "1px solid #333",
+            borderRadius: "14px",
+            padding: "16px",
+          }}
+        >
+          <p style={{ color:"#aaa" }}>
+            Active
+          </p>
+          <h2 style={{ color:"#fff" }}>
+            {
+              warranties.filter(
+                (w) =>
+                  w.status ===
+                  "Active"
+              ).length
+            }
+          </h2>
+        </div>
+
+        <div
+          style={{
+            background: "#202020",
+            border: "1px solid #333",
+            borderRadius: "14px",
+            padding: "16px",
+          }}
+        >
+          <p style={{ color:"#aaa" }}>
+            Center
+          </p>
+          <h2 style={{ color:"#fff" }}>
+            {centerName}
+          </h2>
+        </div>
+      </div>
+
       <h3 style={{ color: "#fff" }}>
         {t.center}
         {" "}
