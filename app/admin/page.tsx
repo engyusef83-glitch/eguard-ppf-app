@@ -435,13 +435,25 @@ export default function AdminPage() {
       >
         <div style={{ display:"flex", gap:"8px", marginBottom:"16px" }}>
         <button
-          style={{ padding:"8px 12px" }}
+          style={{
+            padding: "8px 12px",
+            color: "#fff",
+            background: "#333",
+            border: "1px solid #555",
+            borderRadius: "10px",
+          }}
           onClick={() => setLanguage("en")}
         >
           English
         </button>
         <button
-          style={{ padding:"8px 12px" }}
+          style={{
+            padding: "8px 12px",
+            color: "#fff",
+            background: "#333",
+            border: "1px solid #555",
+            borderRadius: "10px",
+          }}
           onClick={() => setLanguage("ar")}
         >
           العربية
