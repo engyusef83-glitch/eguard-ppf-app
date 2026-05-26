@@ -122,29 +122,29 @@ export default function AdminPage() {
         }
       : {
           dashboard:
-            "{t.dashboard}",
+            "Admin Dashboard",
           logout:
-            "{t.logout}",
+            "Logout",
           customer:
             "Customer Name",
           vin: "VIN",
           roll:
             "Roll Number",
           scanVin:
-            "{t.scanVin}",
+            "Scan VIN",
           scanRoll:
-            "{t.scanRoll}",
+            "Scan Roll",
           country:
-            "{t.country}",
+            "Country: Iraq",
           city: "City",
           add:
-            "{t.add}",
+            "Add Warranty",
           scanner:
-            "{t.scanner}",
+            "Point camera to barcode or QR code",
           close:
-            "{t.close}",
+            "Close Scanner",
           center:
-            "{t.center}",
+            "Center:",
         };
 
 
@@ -209,7 +209,7 @@ export default function AdminPage() {
     setWarranties(data || []);
   }
 
-  async function handle{t.logout}() {
+  async function handleLogout() {
     await supabase.auth.signOut();
     router.push("/login");
   }
@@ -398,22 +398,11 @@ export default function AdminPage() {
   }
 
   if (loading) {
-    return <div style={{ display:"flex", gap:"8px", marginBottom:"16px" }}>
-        <button
-          style={{ padding:"8px 12px" }}
-          onClick={() => setLanguage("en")}
-        >
-          English
-        </button>
-        <button
-          style={{ padding:"8px 12px" }}
-          onClick={() => setLanguage("ar")}
-        >
-          العربية
-        </button>
-      </div>
-
-      <h1 style={{ color: "#fff" }}>Loading...</h1>;
+    return (
+      <h1 style={{ color: "#fff" }}>
+        Loading...
+      </h1>
+    );
   }
 
   return (
@@ -465,7 +454,7 @@ export default function AdminPage() {
 
         <button
           style={{ background:"#222", color:"#fff", borderRadius:"10px", padding:"10px" }}
-          onClick={handle{t.logout}}
+          onClick={handleLogout}
         >
           {t.logout}
         </button>
