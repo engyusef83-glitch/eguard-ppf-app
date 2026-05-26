@@ -88,6 +88,65 @@ export default function AdminPage() {
 
   const [showRollScanner, setShowRollScanner] =
     useState(false);
+  const [language, setLanguage] =
+    useState<"en" | "ar">("en");
+
+  const t =
+    language === "ar"
+      ? {
+          dashboard:
+            "لوحة التحكم",
+          logout:
+            "تسجيل الخروج",
+          customer:
+            "اسم الزبون",
+          vin: "رقم VIN",
+          roll:
+            "رقم الرولة",
+          scanVin:
+            "فحص VIN",
+          scanRoll:
+            "فحص الرولة",
+          country:
+            "الدولة: العراق",
+          city:
+            "المدينة",
+          add:
+            "إضافة الضمان",
+          scanner:
+            "وجّه الكاميرا نحو الباركود أو QR",
+          close:
+            "إغلاق السكانر",
+          center:
+            "المركز:",
+        }
+      : {
+          dashboard:
+            "{t.dashboard}",
+          logout:
+            "{t.logout}",
+          customer:
+            "Customer Name",
+          vin: "VIN",
+          roll:
+            "Roll Number",
+          scanVin:
+            "{t.scanVin}",
+          scanRoll:
+            "{t.scanRoll}",
+          country:
+            "{t.country}",
+          city: "City",
+          add:
+            "{t.add}",
+          scanner:
+            "{t.scanner}",
+          close:
+            "{t.close}",
+          center:
+            "{t.center}",
+        };
+
 
   useEffect(() => {
     checkUser();
@@ -150,7 +209,7 @@ export default function AdminPage() {
     setWarranties(data || []);
   }
 
-  async function handleLogout() {
+  async function handle{t.logout}() {
     await supabase.auth.signOut();
     router.push("/login");
   }
@@ -339,7 +398,22 @@ export default function AdminPage() {
   }
 
   if (loading) {
-    return <h1 style={{ color: "#fff" }}>Loading...</h1>;
+    return <div style={{ display:"flex", gap:"8px", marginBottom:"16px" }}>
+        <button
+          style={{ padding:"8px 12px" }}
+          onClick={() => setLanguage("en")}
+        >
+          English
+        </button>
+        <button
+          style={{ padding:"8px 12px" }}
+          onClick={() => setLanguage("ar")}
+        >
+          العربية
+        </button>
+      </div>
+
+      <h1 style={{ color: "#fff" }}>Loading...</h1>;
   }
 
   return (
@@ -370,27 +444,42 @@ export default function AdminPage() {
           marginBottom: "30px",
         }}
       >
-        <h1 style={{ color: "#fff" }}>
-          Admin Dashboard
+        <div style={{ display:"flex", gap:"8px", marginBottom:"16px" }}>
+        <button
+          style={{ padding:"8px 12px" }}
+          onClick={() => setLanguage("en")}
+        >
+          English
+        </button>
+        <button
+          style={{ padding:"8px 12px" }}
+          onClick={() => setLanguage("ar")}
+        >
+          العربية
+        </button>
+      </div>
+
+      <h1 style={{ color: "#fff" }}>
+          {t.dashboard}
         </h1>
 
         <button
           style={{ background:"#222", color:"#fff", borderRadius:"10px", padding:"10px" }}
-          onClick={handleLogout}
+          onClick={handle{t.logout}}
         >
-          Logout
+          {t.logout}
         </button>
       </div>
 
       <h3 style={{ color: "#fff" }}>
-        Center:
+        {t.center}
         {" "}
         {centerName}
       </h3>
 
       <input
         type="text"
-        placeholder="Customer Name"
+        placeholder={t.customer}
         style={{
           width: "100%",
           padding: "14px",
@@ -420,7 +509,7 @@ export default function AdminPage() {
           }}
         >
           <p style={{ color: "#fff" }}>
-            Point camera to barcode or QR code
+            {t.scanner}
           </p>
 
           <div id="vin-reader"></div>
@@ -432,7 +521,7 @@ export default function AdminPage() {
               setShowVinScanner(false)
             }
           >
-            Close Scanner
+            {t.close}
           </button>
         </div>
       )}
@@ -449,7 +538,7 @@ export default function AdminPage() {
       >
         <input
           type="text"
-          placeholder="VIN"
+          placeholder={t.vin}
           value={vin}
           onChange={(e) =>
             setVin(
@@ -473,7 +562,7 @@ export default function AdminPage() {
             startVinScanner()
           }
         >
-          Scan VIN
+          {t.scanVin}
         </button>
       </div>
 
@@ -489,7 +578,7 @@ export default function AdminPage() {
       >
         <input
           type="text"
-          placeholder="Roll Number"
+          placeholder={t.roll}
           value={rollNumber}
           onChange={(e) =>
             setRollNumber(
@@ -513,7 +602,7 @@ export default function AdminPage() {
             startRollScanner()
           }
         >
-          Scan Roll
+          {t.scanRoll}
         </button>
       </div>
 
@@ -531,7 +620,7 @@ export default function AdminPage() {
           }}
         >
           <p style={{ color: "#fff" }}>
-            Point camera to barcode or QR code
+            {t.scanner}
           </p>
 
           <div id="roll-reader"></div>
@@ -543,13 +632,13 @@ export default function AdminPage() {
               setShowRollScanner(false)
             }
           >
-            Close Scanner
+            {t.close}
           </button>
         </div>
       )}
 
       <p style={{ color: "#fff" }}>
-        Country: Iraq
+        {t.country}
       </p>
 
       <select
@@ -586,7 +675,7 @@ export default function AdminPage() {
 
       <input
         type="text"
-        placeholder="City"
+        placeholder={t.city}
         style={{
           width: "100%",
           padding: "14px",
@@ -661,7 +750,7 @@ export default function AdminPage() {
           background: "#fff",
         }}
       >
-        Add Warranty
+        {t.add}
       </button>
 
       <hr />
@@ -692,7 +781,7 @@ export default function AdminPage() {
             </p>
 
             <p style={{ color: "#fff" }}>
-              Center:
+              {t.center}
               {" "}
               {
                 item.center_name
