@@ -400,6 +400,51 @@ export default function AdminPage() {
     });
   }
 
+
+  function printWarranty(item: Warranty) {
+    const win = window.open("", "_blank");
+    if (!win) return;
+
+    win.document.write(`
+      <html>
+      <head>
+        <title>Warranty Certificate</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            color: #111;
+          }
+          h1 {
+            margin-bottom: 30px;
+          }
+          .row {
+            margin-bottom: 12px;
+          }
+          .label {
+            font-weight: bold;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Warranty Certificate</h1>
+        <div class="row"><span class="label">Center:</span> ${item.center_name}</div>
+        <div class="row"><span class="label">Customer:</span> ${item.customer_name}</div>
+        <div class="row"><span class="label">VIN:</span> ${item.vin}</div>
+        <div class="row"><span class="label">Roll Number:</span> ${item.roll_number}</div>
+        <div class="row"><span class="label">Product:</span> ${item.product_name}</div>
+        <div class="row"><span class="label">Warranty:</span> ${item.duration_years} Years</div>
+        <div class="row"><span class="label">Start Date:</span> ${item.start_date}</div>
+        <div class="row"><span class="label">End Date:</span> ${item.end_date}</div>
+        <div class="row"><span class="label">Status:</span> ${item.status}</div>
+        <div class="row"><span class="label">Location:</span> ${item.governorate} / ${item.city}</div>
+      </body>
+      </html>
+    `);
+    win.document.close();
+    win.print();
+  }
+
   if (loading) {
     return (
       <h1 style={{ color: "#fff" }}>
@@ -1037,6 +1082,23 @@ export default function AdminPage() {
                 marginTop:"12px",
               }}
             >
+              <button
+                style={{
+                  background:"#2d5a27",
+                  color:"#fff",
+                  border:"none",
+                  borderRadius:"8px",
+                  padding:"8px 14px",
+                  fontSize:"14px",
+                  marginRight:"8px"
+                }}
+                onClick={() =>
+                  printWarranty(item)
+                }
+              >
+                Print
+              </button>
+
               <button
                 style={{
                   background:"#7a1f1f",
