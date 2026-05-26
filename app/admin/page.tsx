@@ -546,6 +546,13 @@ export default function AdminPage() {
         {centerName}
       </h3>
 
+      <div style={{
+        background:"#202020",
+        border:"1px solid #333",
+        borderRadius:"16px",
+        padding:"18px",
+        marginBottom:"18px"
+      }}>
       <h3 style={{ color:"#fff", marginBottom:"10px" }}>
         Customer Information
       </h3>
@@ -574,6 +581,8 @@ export default function AdminPage() {
           )
         }
       />
+
+      </div>
 
       {showVinScanner && (
         <div
@@ -606,7 +615,14 @@ export default function AdminPage() {
       <br />
       <br />
 
-      <h3 style={{ color:"#fff", marginBottom:"10px", marginTop:"20px" }}>
+      <div style={{
+        background:"#202020",
+        border:"1px solid #333",
+        borderRadius:"16px",
+        padding:"18px",
+        marginBottom:"18px"
+      }}>
+      <h3 style={{ color:"#fff", marginBottom:"10px" }}>
         Vehicle Information
       </h3>
 
@@ -702,6 +718,8 @@ export default function AdminPage() {
       <br />
       <br />
 
+      </div>
+
       {showRollScanner && (
         <div
           style={{
@@ -730,7 +748,14 @@ export default function AdminPage() {
         </div>
       )}
 
-      <h3 style={{ color:"#fff", marginTop:"20px" }}>
+      <div style={{
+        background:"#202020",
+        border:"1px solid #333",
+        borderRadius:"16px",
+        padding:"18px",
+        marginBottom:"18px"
+      }}>
+      <h3 style={{ color:"#fff" }}>
         Location
       </h3>
 
@@ -851,6 +876,8 @@ export default function AdminPage() {
 
       <br />
       <br />
+
+      </div>
 
       <button
         onClick={addWarranty}
