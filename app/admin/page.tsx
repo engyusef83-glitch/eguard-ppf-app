@@ -427,9 +427,9 @@ export default function AdminPage() {
       <div
         style={{
           display: "flex",
-          justifyContent:
-            "space-between",
-          alignItems: "center",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: "12px",
           marginBottom: "30px",
         }}
       >
