@@ -909,88 +909,125 @@ export default function AdminPage() {
         })
         .map(
         (item) => (
+          
           <div
             key={item.id}
             style={{
-              background: "#202020",
-              border: "1px solid #333",
-              borderRadius: "16px",
-              padding: "18px",
-              marginBottom: "16px",
+              background: "#1c1c1c",
+              border: "1px solid #2f2f2f",
+              borderRadius: "14px",
+              padding: "14px",
+              marginBottom: "14px",
             }}
           >
-            <h3 style={{
-              color: "#fff",
-              marginBottom: "14px",
-            }}>
-              {
-                item.customer_name
-              }
+            <h3
+              style={{
+                color: "#fff",
+                marginBottom: "12px",
+                fontSize: "18px",
+              }}
+            >
+              {item.customer_name}
             </h3>
 
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px,1fr))", gap:"10px" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(140px, 1fr))",
+                gap: "10px",
+              }}
+            >
               <div>
-                <p style={{ color:"#888", marginBottom:"4px" }}>VIN</p>
-                <p style={{ color:"#fff" }}>{item.vin}</p>
+                <p style={{color:"#888",fontSize:"12px"}}>VIN</p>
+                <p style={{color:"#fff"}}>{item.vin}</p>
               </div>
+
               <div>
-                <p style={{ color:"#888", marginBottom:"4px" }}>Roll Number</p>
-                <p style={{ color:"#fff" }}>{item.roll_number}</p>
+                <p style={{color:"#888",fontSize:"12px"}}>Roll</p>
+                <p style={{color:"#fff"}}>
+                  {item.roll_number}
+                </p>
               </div>
+
               <div>
-                <p style={{ color:"#888", marginBottom:"4px" }}>Product</p>
-                <p style={{ color:"#fff" }}>{item.product_name}</p>
+                <p style={{color:"#888",fontSize:"12px"}}>Product</p>
+                <p style={{color:"#fff"}}>
+                  {item.product_name}
+                </p>
               </div>
+
               <div>
-                <p style={{ color:"#888", marginBottom:"4px" }}>Warranty</p>
-                <p style={{ color:"#fff" }}>{item.duration_years} Years</p>
+                <p style={{color:"#888",fontSize:"12px"}}>
+                  Warranty
+                </p>
+                <p style={{color:"#fff"}}>
+                  {item.duration_years} Years
+                </p>
               </div>
+
               <div>
-                <p style={{ color:"#888", marginBottom:"4px" }}>Governorate</p>
-                <p style={{ color:"#fff" }}>{item.governorate}</p>
+                <p style={{color:"#888",fontSize:"12px"}}>
+                  Start Date
+                </p>
+                <p style={{color:"#fff"}}>
+                  {item.start_date}
+                </p>
               </div>
+
               <div>
-                <p style={{ color:"#888", marginBottom:"4px" }}>City</p>
-                <p style={{ color:"#fff" }}>{item.city}</p>
+                <p style={{color:"#888",fontSize:"12px"}}>
+                  End Date
+                </p>
+                <p style={{color:"#fff"}}>
+                  {item.end_date}
+                </p>
+              </div>
+
+              <div>
+                <p style={{color:"#888",fontSize:"12px"}}>
+                  Status
+                </p>
+                <p style={{color:"#fff"}}>
+                  {item.status}
+                </p>
+              </div>
+
+              <div>
+                <p style={{color:"#888",fontSize:"12px"}}>
+                  Location
+                </p>
+                <p style={{color:"#fff"}}>
+                  {item.governorate} / {item.city}
+                </p>
               </div>
             </div>
 
-
-
-            <p style={{ color: "#fff" }}>
-              {t.center}
-              {" "}
-              {
-                item.center_name
-              }
-            </p>
-
-
-
-
-
-
-
-
-
-            <button
+            <div
               style={{
-                background:"#7a1f1f",
-                color:"#fff",
-                border:"none",
-                borderRadius:"10px",
-                padding:"10px 16px",
-                marginTop:"10px",
+                display:"flex",
+                justifyContent:"flex-end",
+                marginTop:"12px",
               }}
-              onClick={() =>
-                deleteWarranty(
-                  item.id
-                )
-              }
             >
-              Delete
-            </button>
+              <button
+                style={{
+                  background:"#7a1f1f",
+                  color:"#fff",
+                  border:"none",
+                  borderRadius:"8px",
+                  padding:"8px 14px",
+                  fontSize:"14px",
+                }}
+                onClick={() =>
+                  deleteWarranty(item.id)
+                }
+              >
+                Delete
+              </button>
+            </div>
           </div>
+</div>
         )
       )}
           </div>
