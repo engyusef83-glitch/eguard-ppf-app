@@ -406,43 +406,182 @@ export default function AdminPage() {
     if (!win) return;
 
     win.document.write(`
-      <html>
-      <head>
-        <title>Warranty Certificate</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            color: #111;
-          }
-          h1 {
-            margin-bottom: 30px;
-          }
-          .row {
-            margin-bottom: 12px;
-          }
-          .label {
-            font-weight: bold;
-          }
-        </style>
-      </head>
-      <body>
-        <h1>Warranty Certificate</h1>
-        <div class="row"><span class="label">Center:</span> ${item.center_name}</div>
-        <div class="row"><span class="label">Customer:</span> ${item.customer_name}</div>
-        <div class="row"><span class="label">VIN:</span> ${item.vin}</div>
-        <div class="row"><span class="label">Roll Number:</span> ${item.roll_number}</div>
-        <div class="row"><span class="label">Product:</span> ${item.product_name}</div>
-        <div class="row"><span class="label">Warranty:</span> ${item.duration_years} Years</div>
-        <div class="row"><span class="label">Start Date:</span> ${item.start_date}</div>
-        <div class="row"><span class="label">End Date:</span> ${item.end_date}</div>
-        <div class="row"><span class="label">Status:</span> ${item.status}</div>
-        <div class="row"><span class="label">Location:</span> ${item.governorate} / ${item.city}</div>
-      </body>
-      </html>
+    <html>
+    <head>
+      <title>Warranty Certificate</title>
+      <style>
+        body{
+          background:#f5f5f5;
+          font-family:Arial,sans-serif;
+          padding:40px;
+          color:#1a1a1a;
+        }
+        .certificate{
+          background:#fff;
+          max-width:900px;
+          margin:auto;
+          border-radius:22px;
+          padding:50px;
+          box-shadow:0 10px 35px rgba(0,0,0,.08);
+          border:1px solid #ececec;
+        }
+        .top{
+          display:flex;
+          justify-content:space-between;
+          align-items:flex-start;
+          border-bottom:1px solid #e8e8e8;
+          padding-bottom:24px;
+          margin-bottom:35px;
+        }
+        .brand{
+          font-size:34px;
+          font-weight:700;
+          letter-spacing:1px;
+        }
+        .sub{
+          color:#666;
+          margin-top:6px;
+        }
+        .badge{
+          border:1px solid #ddd;
+          border-radius:999px;
+          padding:10px 16px;
+          font-size:13px;
+          color:#444;
+        }
+        .section-title{
+          font-size:13px;
+          letter-spacing:1.5px;
+          color:#888;
+          text-transform:uppercase;
+          margin:28px 0 12px;
+        }
+        .grid{
+          display:grid;
+          grid-template-columns:repeat(2,1fr);
+          gap:18px;
+        }
+        .card{
+          background:#fafafa;
+          border:1px solid #eee;
+          border-radius:16px;
+          padding:18px;
+        }
+        .label{
+          font-size:12px;
+          color:#888;
+          margin-bottom:6px;
+        }
+        .value{
+          font-size:17px;
+          font-weight:600;
+          color:#111;
+          word-break:break-word;
+        }
+        .footer{
+          margin-top:45px;
+          border-top:1px solid #eee;
+          padding-top:20px;
+          color:#666;
+          text-align:center;
+          font-size:14px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="certificate">
+        <div class="top">
+          <div>
+            <div class="brand">EGUARD</div>
+            <div class="sub">
+              Premium Warranty Certificate
+            </div>
+          </div>
+
+          <div class="badge">
+            Authorized Warranty
+          </div>
+        </div>
+
+        <div class="section-title">
+          Customer Information
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <div class="label">Customer Name</div>
+            <div class="value">${item.customer_name}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Center</div>
+            <div class="value">${item.center_name}</div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          Vehicle Information
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <div class="label">VIN</div>
+            <div class="value">${item.vin}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Roll Number</div>
+            <div class="value">${item.roll_number}</div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          Protection Details
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <div class="label">Product</div>
+            <div class="value">${item.product_name}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Warranty</div>
+            <div class="value">${item.duration_years} Years</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Start Date</div>
+            <div class="value">${item.start_date}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">End Date</div>
+            <div class="value">${item.end_date}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Status</div>
+            <div class="value">${item.status}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Location</div>
+            <div class="value">${item.governorate} / ${item.city}</div>
+          </div>
+        </div>
+
+        <div class="footer">
+          Authorized Warranty Certificate
+        </div>
+      </div>
+    </body>
+    </html>
     `);
+
     win.document.close();
-    win.print();
+    win.focus();
+    setTimeout(() => win.print(), 300);
   }
 
   if (loading) {
