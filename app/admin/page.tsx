@@ -103,8 +103,9 @@ export default function AdminPage() {
       return;
     }
 
-    await loadCenter(session.user.id);
-    await loadWarranties();
+    await loadCenter(
+      session.user.id
+    );
 
     setLoading(false);
   }
@@ -117,17 +118,34 @@ export default function AdminPage() {
       .single();
 
     if (data) {
-      setCenterName(data.center_name);
+      setCenterName(
+        data.center_name
+      );
+
+      await loadWarranties(
+        data.center_name
+      );
     }
   }
 
-  async function loadWarranties() {
-    const { data } = await supabase
-      .from("warranties")
-      .select("*")
-      .order("id", {
-        ascending: false,
-      });
+  async function loadWarranties(
+    currentCenterName?: string
+  ) {
+    const center =
+      currentCenterName ||
+      centerName;
+
+    const { data } =
+      await supabase
+        .from("warranties")
+        .select("*")
+        .eq(
+          "center_name",
+          center
+        )
+        .order("id", {
+          ascending: false,
+        });
 
     setWarranties(data || []);
   }
