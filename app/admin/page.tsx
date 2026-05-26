@@ -90,6 +90,9 @@ export default function AdminPage() {
     useState(false);
   const [language, setLanguage] =
     useState<"en" | "ar">("en");
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
 
   const t =
     language === "ar"
@@ -756,7 +759,46 @@ export default function AdminPage() {
 
       <hr />
 
-      {warranties.map(
+
+      <input
+        type="text"
+        placeholder="Search VIN / Customer / Roll"
+        value={searchTerm}
+        onChange={(e) =>
+          setSearchTerm(
+            e.target.value
+          )
+        }
+        style={{
+          width: "100%",
+          padding: "14px",
+          borderRadius: "12px",
+          border: "1px solid #333",
+          fontSize: "16px",
+          color: "#fff",
+          background: "#222",
+          marginBottom: "20px",
+        }}
+      />
+
+      {warranties
+        .filter((item) => {
+          const q =
+            searchTerm.toLowerCase();
+
+          return (
+            item.customer_name
+              ?.toLowerCase()
+              .includes(q) ||
+            item.vin
+              ?.toLowerCase()
+              .includes(q) ||
+            item.roll_number
+              ?.toLowerCase()
+              .includes(q)
+          );
+        })
+        .map(
         (item) => (
           <div
             key={item.id}
