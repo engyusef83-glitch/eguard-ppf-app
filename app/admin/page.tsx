@@ -617,130 +617,286 @@ async function shareWarranty(item: Warranty) {
   try {
     const doc = new jsPDF();
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(24);
-    doc.text("EGUARD", 20, 25);
+const green = [36, 164, 68];
 
-    doc.setFontSize(12);
-    doc.setTextColor(36, 164, 68);
-    doc.text(
-      "Premium Paint Protection Warranty",
-      20,
-      33
-    );
+doc.setFillColor(245, 245, 245);
+doc.rect(0, 0, 210, 297, "F");
 
-    doc.setDrawColor(36, 164, 68);
-    doc.setLineWidth(1);
-    doc.line(20, 38, 90, 38);
-
-    doc.setTextColor(0, 0, 0);
-
-    let y = 55;
-
-    const section = (
-      title: string
-    ) => {
-      doc.setFontSize(14);
-      doc.setFont(
-        "helvetica",
-        "bold"
-      );
-      doc.text(title, 20, y);
-      y += 8;
-    };
-
-    const row = (
-label: string,
-value: string
-) => {
-doc.setFontSize(11);
-
-doc.setFont(
-"helvetica",
-"bold"
+doc.setFillColor(255, 255, 255);
+doc.roundedRect(
+  12,
+  12,
+  186,
+  265,
+  8,
+  8,
+  "F"
 );
 
-doc.text(`${label}:`, 20, y);
+doc.setDrawColor(230, 230, 230);
+doc.roundedRect(
+  12,
+  12,
+  186,
+  265,
+  8,
+  8
+);
+
+// Header
+doc.setFont(
+  "helvetica",
+  "bold"
+);
+
+doc.setFontSize(28);
+doc.text("EGUARD", 20, 30);
 
 doc.setFont(
-"helvetica",
-"normal"
+  "helvetica",
+  "normal"
+);
+
+doc.setFontSize(12);
+doc.setTextColor(90);
+
+doc.text(
+  "Premium Warranty Certificate",
+  20,
+  38
+);
+
+// green line
+doc.setDrawColor(
+  green[0],
+  green[1],
+  green[2]
+);
+
+doc.setLineWidth(1.2);
+
+doc.line(20, 45, 80, 45);
+
+// badge
+doc.setDrawColor(220);
+doc.roundedRect(
+  145,
+  22,
+  40,
+  10,
+  4,
+  4
+);
+
+doc.setFontSize(9);
+doc.setTextColor(70);
+
+doc.text(
+  "Authorized Warranty",
+  151,
+  28
+);
+
+let y = 62;
+
+const section = (
+  title: string
+) => {
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setTextColor(130);
+  doc.setFontSize(10);
+
+  doc.text(
+    title.toUpperCase(),
+    20,
+    y
+  );
+
+  y += 8;
+};
+
+const card = (
+  label: string,
+  value: string,
+  x: number,
+  yPos: number
+) => {
+  doc.setFillColor(
+    250,
+    250,
+    250
+  );
+
+  doc.setDrawColor(
+    235,
+    235,
+    235
+  );
+
+  doc.roundedRect(
+    x,
+    yPos,
+    78,
+    22,
+    4,
+    4,
+    "FD"
+  );
+
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  doc.setTextColor(140);
+  doc.setFontSize(9);
+
+  doc.text(
+    label,
+    x + 4,
+    yPos + 7
+  );
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setTextColor(20);
+  doc.setFontSize(11);
+
+  doc.text(
+    value || "-",
+    x + 4,
+    yPos + 15
+  );
+};
+
+// CUSTOMER
+section(
+  "Customer Information"
+);
+
+card(
+  "Customer Name",
+  item.customer_name,
+  20,
+  y
+);
+
+card(
+  "Center",
+  item.center_name,
+  110,
+  y
+);
+
+y += 34;
+
+// VEHICLE
+section(
+  "Vehicle Information"
+);
+
+card(
+  "VIN",
+  item.vin,
+  20,
+  y
+);
+
+card(
+  "Roll Number",
+  item.roll_number,
+  110,
+  y
+);
+
+y += 34;
+
+// PROTECTION
+section(
+  "Protection Details"
+);
+
+card(
+  "Product",
+  item.product_name,
+  20,
+  y
+);
+
+card(
+  "Warranty",
+  `${item.duration_years} Years`,
+  110,
+  y
+);
+
+y += 28;
+
+card(
+  "Start Date",
+  item.start_date,
+  20,
+  y
+);
+
+card(
+  "End Date",
+  item.end_date,
+  110,
+  y
+);
+
+y += 28;
+
+card(
+  "Status",
+  item.status,
+  20,
+  y
+);
+
+card(
+  "Location",
+  `${item.governorate} / ${item.city}`,
+  110,
+  y
+);
+
+// footer
+doc.setDrawColor(230);
+doc.line(
+  20,
+  255,
+  185,
+  255
+);
+
+doc.setFont(
+  "helvetica",
+  "normal"
+);
+
+doc.setTextColor(110);
+doc.setFontSize(10);
+
+doc.text(
+  "Official EGUARD Paint Protection Warranty",
+  20,
+  265
 );
 
 doc.text(
-value || "-",
-70,
-y
+  "Authorized Service Certificate",
+  20,
+  272
 );
-
-y += 8;
-};
-
-    section(
-      "Customer Information"
-    );
-
-    row(
-      "Customer",
-      item.customer_name
-    );
-
-    row(
-      "Center",
-      item.center_name
-    );
-
-    y += 4;
-
-    section(
-      "Vehicle Information"
-    );
-
-    row("VIN", item.vin);
-
-    row(
-      "Roll Number",
-      item.roll_number
-    );
-
-    y += 4;
-
-    section(
-      "Protection Details"
-    );
-
-    row(
-      "Product",
-      item.product_name
-    );
-
-    row(
-      "Warranty",
-      `${item.duration_years} Years`
-    );
-
-    row(
-      "Start Date",
-      item.start_date
-    );
-
-    row(
-      "End Date",
-      item.end_date
-    );
-
-    row(
-      "Status",
-      item.status
-    );
-
-    row(
-      "Location",
-      `${item.governorate} / ${item.city}`
-    );
-
-    const pdfBlob =
-      doc.output("blob");
 
     const file = new File(
       [pdfBlob],
