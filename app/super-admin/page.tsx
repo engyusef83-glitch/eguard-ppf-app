@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -15,6 +16,9 @@ export default function SuperAdminPage() {
   const [loading, setLoading] =
     useState(true);
 
+  const [centers, setCenters] =
+    useState<any[]>([]);
+
   const [stats, setStats] =
     useState({
       centers: 0,
@@ -27,65 +31,49 @@ export default function SuperAdminPage() {
     checkAccess();
   }, []);
 
- async function checkAccess() {
-  const {
-    data: { user },
-  } =
-    await supabase.auth.getUser();
+  async function checkAccess() {
+    const {
+      data: { user },
+    } =
+      await supabase.auth.getUser();
 
-  if (!user) {
-    router.push("/login");
-    return;
-  }
+    if (!user) {
+      router.push("/login");
+      return;
+    }
 
-  const {
-    data: profile,
-    error,
-  } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("email", user.email)
-    .single();
+    // master account
+    if (
+      user.email ===
+      "eguard.iraq@gmail.com"
+    ) {
+      await loadData();
+      setLoading(false);
+      return;
+    }
 
-  console.log(
-    "USER:",
-    user.email
-  );
+    const {
+      data: profile,
+    } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("email", user.email)
+      .single();
 
-  console.log(
-    "PROFILE:",
-    profile
-  );
+    if (
+      !profile ||
+      profile.role !==
+        "super_admin"
+    ) {
+      router.push("/admin");
+      return;
+    }
 
-  console.log(
-    "ERROR:",
-    error
-  );
-
-  // temporary bypass
-  if (
-    user.email ===
-    "eguard.iraq@gmail.com"
-  ) {
-    await loadStats();
+    await loadData();
     setLoading(false);
-    return;
   }
 
-  if (
-    !profile ||
-    profile.role !==
-      "super_admin"
-  ) {
-    router.push("/admin");
-    return;
-  }
-
-  await loadStats();
-  setLoading(false);
-}
-
-  async function loadStats() {
+  async function loadData() {
     const {
       count: centerCount,
     } = await supabase
@@ -100,6 +88,23 @@ export default function SuperAdminPage() {
     } = await supabase
       .from("warranties")
       .select("*");
+
+    const {
+      data: centersData,
+    } = await supabase
+      .from("centers")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:
+            false,
+        }
+      );
+
+    setCenters(
+      centersData || []
+    );
 
     const active =
       warranties?.filter(
@@ -133,9 +138,24 @@ export default function SuperAdminPage() {
 
   if (loading) {
     return (
-      <h1>
+      <div
+        style={{
+          background:
+            "#0f0f0f",
+          minHeight:
+            "100vh",
+          display:
+            "flex",
+          justifyContent:
+            "center",
+          alignItems:
+            "center",
+          color:
+            "#fff",
+        }}
+      >
         Loading...
-      </h1>
+      </div>
     );
   }
 
@@ -153,11 +173,12 @@ export default function SuperAdminPage() {
       <div
         style={{
           maxWidth:
-            "1200px",
+            "1400px",
           margin:
             "0 auto",
         }}
       >
+        {/* Header */}
         <div
           style={{
             display:
@@ -179,8 +200,7 @@ export default function SuperAdminPage() {
                   "8px",
               }}
             >
-              EGUARD MASTER
-              PANEL
+              EGUARD MASTER PANEL
             </h1>
 
             <p
@@ -189,8 +209,7 @@ export default function SuperAdminPage() {
                   "#888",
               }}
             >
-              Super Admin
-              Dashboard
+              Super Admin Dashboard
             </p>
           </div>
 
@@ -209,12 +228,15 @@ export default function SuperAdminPage() {
                 "12px",
               padding:
                 "12px 18px",
+              cursor:
+                "pointer",
             }}
           >
             Logout
           </button>
         </div>
 
+        {/* Stats Cards */}
         <div
           style={{
             display:
@@ -223,6 +245,8 @@ export default function SuperAdminPage() {
               "repeat(auto-fit,minmax(220px,1fr))",
             gap:
               "16px",
+            marginBottom:
+              "30px",
           }}
         >
           {[
@@ -296,7 +320,275 @@ export default function SuperAdminPage() {
             )
           )}
         </div>
+
+        {/* Centers Management */}
+        <div
+          style={{
+            background:
+              "#1b1b1b",
+            border:
+              "1px solid #2c2c2c",
+            borderRadius:
+              "24px",
+            padding:
+              "24px",
+          }}
+        >
+          <div
+            style={{
+              display:
+                "flex",
+              justifyContent:
+                "space-between",
+              alignItems:
+                "center",
+              marginBottom:
+                "24px",
+            }}
+          >
+            <h2
+              style={{
+                color:
+                  "#fff",
+                margin: 0,
+              }}
+            >
+              Centers Management
+            </h2>
+
+            <button
+              style={{
+                background:
+                  "#24a444",
+                color:
+                  "#fff",
+                border:
+                  "none",
+                borderRadius:
+                  "12px",
+                padding:
+                  "12px 18px",
+                cursor:
+                  "pointer",
+                fontWeight:
+                  600,
+              }}
+            >
+              + Add Center
+            </button>
+          </div>
+
+          <div
+            style={{
+              overflowX:
+                "auto",
+            }}
+          >
+            <table
+              style={{
+                width:
+                  "100%",
+                borderCollapse:
+                  "collapse",
+              }}
+            >
+              <thead>
+                <tr>
+                  {[
+                    "Center",
+                    "Phone",
+                    "Governorate",
+                    "City",
+                    "Email",
+                    "Status",
+                    "Actions",
+                  ].map(
+                    (
+                      item
+                    ) => (
+                      <th
+                        key={
+                          item
+                        }
+                        style={{
+                          color:
+                            "#888",
+                          textAlign:
+                            "left",
+                          padding:
+                            "14px",
+                          borderBottom:
+                            "1px solid #333",
+                        }}
+                      >
+                        {item}
+                      </th>
+                    )
+                  )}
+                </tr>
+              </thead>
+
+              <tbody>
+                {centers.map(
+                  (
+                    center
+                  ) => (
+                    <tr
+                      key={
+                        center.id
+                      }
+                    >
+                      <td
+                        style={{
+                          padding:
+                            "16px",
+                          color:
+                            "#fff",
+                        }}
+                      >
+                        {
+                          center.center_name
+                        }
+                      </td>
+
+                      <td
+                        style={{
+                          padding:
+                            "16px",
+                          color:
+                            "#ddd",
+                        }}
+                      >
+                        {center.phone ||
+                          "-"}
+                      </td>
+
+                      <td
+                        style={{
+                          padding:
+                            "16px",
+                          color:
+                            "#ddd",
+                        }}
+                      >
+                        {center.governorate ||
+                          "-"}
+                      </td>
+
+                      <td
+                        style={{
+                          padding:
+                            "16px",
+                          color:
+                            "#ddd",
+                        }}
+                      >
+                        {center.city ||
+                          "-"}
+                      </td>
+
+                      <td
+                        style={{
+                          padding:
+                            "16px",
+                          color:
+                            "#ddd",
+                        }}
+                      >
+                        {
+                          center.email
+                        }
+                      </td>
+
+                      <td
+                        style={{
+                          padding:
+                            "16px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            background:
+                              center.status ===
+                              "Suspended"
+                                ? "#742a2a"
+                                : "#24a444",
+                            color:
+                              "#fff",
+                            padding:
+                              "8px 12px",
+                            borderRadius:
+                              "999px",
+                            fontSize:
+                              "12px",
+                          }}
+                        >
+                          {center.status ||
+                            "Active"}
+                        </span>
+                      </td>
+
+                      <td
+                        style={{
+                          padding:
+                            "16px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display:
+                              "flex",
+                            gap:
+                              "8px",
+                            flexWrap:
+                              "wrap",
+                          }}
+                        >
+                          {[
+                            "Edit",
+                            "Reset Password",
+                            "Disable",
+                            "Delete",
+                          ].map(
+                            (
+                              action
+                            ) => (
+                              <button
+                                key={
+                                  action
+                                }
+                                style={{
+                                  background:
+                                    "#222",
+                                  border:
+                                    "1px solid #333",
+                                  color:
+                                    "#fff",
+                                  borderRadius:
+                                    "10px",
+                                  padding:
+                                    "8px 12px",
+                                  cursor:
+                                    "pointer",
+                                }}
+                              >
+                                {
+                                  action
+                                }
+                              </button>
+                            )
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
