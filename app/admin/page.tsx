@@ -455,35 +455,35 @@ async function shareWarranty(item: Warranty) {
     };
 
     const row = (
-      label: string,
-      value: string
-    ) => {
-      doc.setFontSize(11);
+label: string,
+value: string
+) => {
+doc.setFontSize(11);
 
-      doc.setFont(
-        "helvetica",
-        "bold"
-      );
+doc.setFont(
+"helvetica",
+"bold"
+);
 
-      doc.text(
-        `${label}:`,
-        20,
-        y
-      );
+doc.text(
+`${label}:`,
+20,
+y
+);
 
-      doc.setFont(
-        "helvetica",
-        "normal"
-      );
+doc.setFont(
+"helvetica",
+"normal"
+);
 
-      doc.text(
-        value || "-",
-        70,
-        y
-      );
+doc.text(
+value || "-",
+70,
+y
+);
 
-      y += 8;
-    };
+y += 8;
+};
 
     section(
       "Customer Information"
