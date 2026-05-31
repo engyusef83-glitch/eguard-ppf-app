@@ -89,23 +89,35 @@ export default function SuperAdminPage() {
       .from("warranties")
       .select("*");
 
-    const {
-      data: centersData,
-    } = await supabase
-      .from("centers")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:
-            false,
-        }
-      );
+   const {
+  data: centersData,
+  error: centersError,
+} = await supabase
+  .from("centers")
+  .select("*")
+  .order(
+    "created_at",
+    {
+      ascending:
+        false,
+    }
+  );
 
-    setCenters(
-      centersData || []
-    );
+console.log(
+  "CENTERS:",
+  centersData
+);
 
+console.log(
+  "CENTERS ERROR:",
+  centersError
+);
+
+
+
+setCenters(
+  centersData || []
+);
     const active =
       warranties?.filter(
         (w) =>
