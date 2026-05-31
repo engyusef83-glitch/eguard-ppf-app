@@ -580,8 +580,11 @@ export default function AdminPage() {
     `);
 
     win.document.close();
-    win.focus();
-    setTimeout(() => win.print(), 300);
+
+win.onload = () => {
+  win.focus();
+  win.print();
+};
   }
 
   if (loading) {
