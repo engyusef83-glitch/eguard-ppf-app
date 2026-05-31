@@ -408,7 +408,7 @@ export default function AdminPage() {
     win.document.write(`
     <html>
     <head>
-      <title>Warranty Certificate</title>
+      <title>${item.customer_name} - Warranty</title>
       <style>
         body{
           background:#f5f5f5;
