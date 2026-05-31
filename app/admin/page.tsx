@@ -418,169 +418,7 @@ export default function AdminPage() {
           color:#1a1a1a;
         }
 
-async function shareWarranty(item: Warranty) {
-  try {
-    const doc = new jsPDF();
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(24);
-    doc.text("EGUARD", 20, 25);
-
-    doc.setFontSize(12);
-    doc.setTextColor(36, 164, 68);
-    doc.text(
-      "Premium Paint Protection Warranty",
-      20,
-      33
-    );
-
-    doc.setDrawColor(36, 164, 68);
-    doc.setLineWidth(1);
-    doc.line(20, 38, 90, 38);
-
-    doc.setTextColor(0, 0, 0);
-
-    let y = 55;
-
-    const section = (
-      title: string
-    ) => {
-      doc.setFontSize(14);
-      doc.setFont(
-        "helvetica",
-        "bold"
-      );
-      doc.text(title, 20, y);
-      y += 8;
-    };
-
-    const row = (
-label: string,
-value: string
-) => {
-doc.setFontSize(11);
-
-doc.setFont(
-"helvetica",
-"bold"
-);
-
-doc.text(`${label}:`, 20, y);
-
-doc.setFont(
-"helvetica",
-"normal"
-);
-
-doc.text(
-value || "-",
-70,
-y
-);
-
-y += 8;
-};
-
-    section(
-      "Customer Information"
-    );
-
-    row(
-      "Customer",
-      item.customer_name
-    );
-
-    row(
-      "Center",
-      item.center_name
-    );
-
-    y += 4;
-
-    section(
-      "Vehicle Information"
-    );
-
-    row("VIN", item.vin);
-
-    row(
-      "Roll Number",
-      item.roll_number
-    );
-
-    y += 4;
-
-    section(
-      "Protection Details"
-    );
-
-    row(
-      "Product",
-      item.product_name
-    );
-
-    row(
-      "Warranty",
-      `${item.duration_years} Years`
-    );
-
-    row(
-      "Start Date",
-      item.start_date
-    );
-
-    row(
-      "End Date",
-      item.end_date
-    );
-
-    row(
-      "Status",
-      item.status
-    );
-
-    row(
-      "Location",
-      `${item.governorate} / ${item.city}`
-    );
-
-    const pdfBlob =
-      doc.output("blob");
-
-    const file = new File(
-      [pdfBlob],
-      `${item.customer_name} - Warranty.pdf`,
-      {
-        type:
-          "application/pdf",
-      }
-    );
-
-    if (
-      navigator.canShare &&
-      navigator.canShare({
-        files: [file],
-      })
-    ) {
-      await navigator.share({
-        title:
-          "Warranty Certificate",
-        text:
-          `${item.customer_name} Warranty`,
-        files: [file],
-      });
-    } else {
-      doc.save(
-        `${item.customer_name} - Warranty.pdf`
-      );
-    }
-  } catch (error) {
-    console.error(error);
-    alert(
-      "Failed to share PDF"
-    );
-  }
-}
         .certificate{
           background:#fff;
           max-width:900px;
@@ -611,7 +449,7 @@ background:#24A444;
 border-radius:999px;
 }
 
-        }
+        
         .brand{
           font-size:34px;
           font-weight:700;
@@ -775,6 +613,169 @@ win.onload = () => {
   win.print();
 };
   }
+async function shareWarranty(item: Warranty) {
+  try {
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(24);
+    doc.text("EGUARD", 20, 25);
+
+    doc.setFontSize(12);
+    doc.setTextColor(36, 164, 68);
+    doc.text(
+      "Premium Paint Protection Warranty",
+      20,
+      33
+    );
+
+    doc.setDrawColor(36, 164, 68);
+    doc.setLineWidth(1);
+    doc.line(20, 38, 90, 38);
+
+    doc.setTextColor(0, 0, 0);
+
+    let y = 55;
+
+    const section = (
+      title: string
+    ) => {
+      doc.setFontSize(14);
+      doc.setFont(
+        "helvetica",
+        "bold"
+      );
+      doc.text(title, 20, y);
+      y += 8;
+    };
+
+    const row = (
+label: string,
+value: string
+) => {
+doc.setFontSize(11);
+
+doc.setFont(
+"helvetica",
+"bold"
+);
+
+doc.text(`${label}:`, 20, y);
+
+doc.setFont(
+"helvetica",
+"normal"
+);
+
+doc.text(
+value || "-",
+70,
+y
+);
+
+y += 8;
+};
+
+    section(
+      "Customer Information"
+    );
+
+    row(
+      "Customer",
+      item.customer_name
+    );
+
+    row(
+      "Center",
+      item.center_name
+    );
+
+    y += 4;
+
+    section(
+      "Vehicle Information"
+    );
+
+    row("VIN", item.vin);
+
+    row(
+      "Roll Number",
+      item.roll_number
+    );
+
+    y += 4;
+
+    section(
+      "Protection Details"
+    );
+
+    row(
+      "Product",
+      item.product_name
+    );
+
+    row(
+      "Warranty",
+      `${item.duration_years} Years`
+    );
+
+    row(
+      "Start Date",
+      item.start_date
+    );
+
+    row(
+      "End Date",
+      item.end_date
+    );
+
+    row(
+      "Status",
+      item.status
+    );
+
+    row(
+      "Location",
+      `${item.governorate} / ${item.city}`
+    );
+
+    const pdfBlob =
+      doc.output("blob");
+
+    const file = new File(
+      [pdfBlob],
+      `${item.customer_name} - Warranty.pdf`,
+      {
+        type:
+          "application/pdf",
+      }
+    );
+
+    if (
+      navigator.canShare &&
+      navigator.canShare({
+        files: [file],
+      })
+    ) {
+      await navigator.share({
+        title:
+          "Warranty Certificate",
+        text:
+          `${item.customer_name} Warranty`,
+        files: [file],
+      });
+    } else {
+      doc.save(
+        `${item.customer_name} - Warranty.pdf`
+      );
+    }
+  } catch (error) {
+    console.error(error);
+    alert(
+      "Failed to share PDF"
+    );
+  }
+}
 
   if (loading) {
     return (
