@@ -426,12 +426,26 @@ export default function AdminPage() {
           border:1px solid #ececec;
         }
         .top{
-          display:flex;
-          justify-content:space-between;
-          align-items:flex-start;
-          border-bottom:1px solid #e8e8e8;
-          padding-bottom:24px;
-          margin-bottom:35px;
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+border-bottom:1px solid #e8e8e8;
+padding-bottom:24px;
+margin-bottom:35px;
+position:relative;
+}
+
+.top::after{
+content:"";
+position:absolute;
+bottom:-1px;
+left:0;
+width:180px;
+height:3px;
+background:#24A444;
+border-radius:999px;
+}
+
         }
         .brand{
           font-size:34px;
