@@ -466,9 +466,9 @@ doc.setFont(
 );
 
 doc.text(
-`${label}:`,
-20,
-y
+  `${label}:`,
+  20,
+  y
 );
 
 doc.setFont(
