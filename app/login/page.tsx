@@ -17,25 +17,78 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  async function handleLogin() {
-    setLoading(true);
-    setMessage("");
+ async function handleLogin() {
+  setLoading(true);
+  setMessage("");
 
-    const { error } = await supabase.auth.signInWithPassword({
+  const { error } =
+    await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
+  if (error) {
     setLoading(false);
-
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
-
-    router.push("/admin");
+    setMessage(error.message);
+    return;
   }
 
+  const {
+    data: { user },
+  } =
+    await supabase.auth.getUser();
+
+  if (!user) {
+    setLoading(false);
+    setMessage(
+      "User not found"
+    );
+    return;
+  }
+
+ const {
+  data: profile,
+  error: profileError,
+} = await supabase
+  .from("profiles")
+  .select("*")
+  .eq("email", user.email)
+  .single();
+
+console.log(
+  "PROFILE:",
+  profile
+);
+
+  setLoading(false);
+
+  console.log(
+  "LOGIN PROFILE:",
+  profile
+);
+
+if (
+  user.email ===
+  "eguard.iraq@gmail.com"
+) {
+  router.push(
+    "/super-admin"
+  );
+  return;
+}
+
+if (
+  profile?.role ===
+  "super_admin"
+) {
+  router.push(
+    "/super-admin"
+  );
+  return;
+}
+
+router.push("/admin");
+}
   return (
     <div
       style={{
