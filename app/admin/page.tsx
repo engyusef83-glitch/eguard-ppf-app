@@ -465,11 +465,7 @@ doc.setFont(
 "bold"
 );
 
-doc.text(
-  `${label}:`,
-  20,
-  y
-);
+doc.text(`${label}:`, 20, y);
 
 doc.setFont(
 "helvetica",
