@@ -500,6 +500,16 @@ border-radius:999px;
           text-align:center;
           font-size:14px;
         }
+@media print {
+  *{
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .top::after{
+    background:#24A444 !important;
+  }
+}
       </style>
     </head>
     <body>
