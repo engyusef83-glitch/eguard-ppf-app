@@ -898,6 +898,8 @@ doc.text(
   272
 );
 
+const pdfBlob = doc.output("blob");
+
     const file = new File(
       [pdfBlob],
       `${item.customer_name} - Warranty.pdf`,
