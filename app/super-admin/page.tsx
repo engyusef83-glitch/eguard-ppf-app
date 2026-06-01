@@ -8,6 +8,7 @@ import StatsCards from "./components/StatsCards";
 import CentersTable from "./components/CentersTable";
 import AddCenterModal from "./components/AddCenterModal";
 import EditCenterModal from "./components/EditCenterModal";
+import ResetPasswordModal from "./components/ResetPasswordModal";
 
 
 
@@ -41,6 +42,19 @@ const [selectedCenter, setSelectedCenter] =
       active: 0,
       expired: 0,
     });
+
+const [
+  showResetPassword,
+  setShowResetPassword,
+] = useState(false);
+
+const [
+  selectedResetCenter,
+  setSelectedResetCenter,
+] = useState<any>(
+  null
+);
+
 
   useEffect(() => {
     checkAccess();
@@ -211,6 +225,7 @@ const [selectedCenter, setSelectedCenter] =
         />
 
        
+
 <CentersTable
   centers={centers}
   onAddCenter={() =>
@@ -229,7 +244,20 @@ const [selectedCenter, setSelectedCenter] =
       true
     );
   }}
+  onResetPassword={(
+    center
+  ) => {
+    setSelectedResetCenter(
+      center
+    );
+
+    setShowResetPassword(
+      true
+    );
+  }}
 />
+
+
 
 
 
@@ -258,6 +286,30 @@ const [selectedCenter, setSelectedCenter] =
     )
   }
 />
+
+<ResetPasswordModal
+  open={
+    showResetPassword
+  }
+  userId={
+    selectedResetCenter?.user_id
+  }
+  centerName={
+    selectedResetCenter?.center_name ||
+    ""
+  }
+  onClose={() => {
+    setShowResetPassword(
+      false
+    );
+
+    setSelectedResetCenter(
+      null
+    );
+  }}
+/>
+
+
 
 
       </div>

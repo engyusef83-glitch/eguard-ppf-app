@@ -17,16 +17,44 @@ export async function POST(
     const body =
       await request.json();
 
-    const {
-      center_name,
-      email,
-      password,
-      phone,
-      governorate,
-      city,
-      address,
-      status,
-    } = body;
+  
+const {
+  center_name,
+  email,
+  phone,
+  governorate,
+  city,
+  address,
+  status,
+} = body;
+
+function generatePassword() {
+  const chars =
+    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+
+  let password =
+    "EG-";
+
+  for (
+    let i = 0;
+    i < 8;
+    i++
+  ) {
+    password +=
+      chars.charAt(
+        Math.floor(
+          Math.random() *
+            chars.length
+        )
+      );
+  }
+
+  return password;
+}
+
+const password =
+  generatePassword();
+
 
     const {
       data: authUser,
@@ -132,12 +160,14 @@ export async function POST(
       );
     }
 
-    return NextResponse.json(
-      {
-        success:
-          true,
-      }
-    );
+
+return NextResponse.json({
+  success: true,
+  email,
+  password,
+});
+
+
   } catch (
     error: any
   ) {

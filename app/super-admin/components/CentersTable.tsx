@@ -18,7 +18,12 @@ type Props = {
   onEditCenter: (
     center: Center
   ) => void;
+  onResetPassword: (
+    center: Center
+  ) => void;
 };
+
+
 
 
 
@@ -26,7 +31,10 @@ export default function CentersTable({
   centers,
   onAddCenter,
   onEditCenter,
+  onResetPassword,
 }: Props)
+
+
 
  {
   return (
@@ -238,39 +246,72 @@ export default function CentersTable({
                     </span>
                   </td>
 
-                  <td
-                    style={{
-                      padding:
-                        "16px",
-                    }}
-                  >
-                    
-<button
-  onClick={() =>
-    onEditCenter(
-      center
-    )
-  }
+              
+<td
   style={{
-    background:
-      "#222",
-    border:
-      "1px solid #333",
-    color:
-      "#fff",
-    borderRadius:
-      "10px",
     padding:
-      "8px 12px",
-    cursor:
-      "pointer",
+      "16px",
   }}
 >
-  Edit
-</button>
+  <div
+    style={{
+      display:
+        "flex",
+      gap:
+        "10px",
+    }}
+  >
+    <button
+      onClick={() =>
+        onEditCenter(
+          center
+        )
+      }
+      style={{
+        background:
+          "#222",
+        border:
+          "1px solid #333",
+        color:
+          "#fff",
+        borderRadius:
+          "10px",
+        padding:
+          "8px 12px",
+        cursor:
+          "pointer",
+      }}
+    >
+      Edit
+    </button>
+
+    <button
+      onClick={() =>
+        onResetPassword(
+          center
+        )
+      }
+      style={{
+        background:
+          "#24a444",
+        border:
+          "none",
+        color:
+          "#fff",
+        borderRadius:
+          "10px",
+        padding:
+          "8px 12px",
+        cursor:
+          "pointer",
+      }}
+    >
+      Reset Password
+    </button>
+  </div>
+</td>
 
 
-                  </td>
                 </tr>
               )
             )}
