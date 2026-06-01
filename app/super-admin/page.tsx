@@ -7,6 +7,9 @@ import Header from "./components/Header";
 import StatsCards from "./components/StatsCards";
 import CentersTable from "./components/CentersTable";
 import AddCenterModal from "./components/AddCenterModal";
+import EditCenterModal from "./components/EditCenterModal";
+
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,6 +24,12 @@ export default function SuperAdminPage() {
 
   const [showAddCenter, setShowAddCenter] =
     useState(false);
+
+const [showEditCenter, setShowEditCenter] =
+  useState(false);
+
+const [selectedCenter, setSelectedCenter] =
+  useState<any>(null);
 
   const [centers, setCenters] =
     useState<any[]>([]);
@@ -201,16 +210,28 @@ export default function SuperAdminPage() {
           stats={stats}
         />
 
-        <CentersTable
-          centers={
-            centers
-          }
-          onAddCenter={() =>
-            setShowAddCenter(
-              true
-            )
-          }
-        />
+       
+<CentersTable
+  centers={centers}
+  onAddCenter={() =>
+    setShowAddCenter(
+      true
+    )
+  }
+  onEditCenter={(
+    center
+  ) => {
+    setSelectedCenter(
+      center
+    );
+
+    setShowEditCenter(
+      true
+    );
+  }}
+/>
+
+
 
         <AddCenterModal
           open={
@@ -222,6 +243,23 @@ export default function SuperAdminPage() {
             )
           }
         />
+
+
+<EditCenterModal
+  open={
+    showEditCenter
+  }
+  center={
+    selectedCenter
+  }
+  onClose={() =>
+    setShowEditCenter(
+      false
+    )
+  }
+/>
+
+
       </div>
     </div>
   );

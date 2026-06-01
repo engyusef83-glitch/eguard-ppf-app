@@ -11,15 +11,24 @@ type Center = {
   status?: string;
 };
 
+
 type Props = {
   centers: Center[];
   onAddCenter: () => void;
+  onEditCenter: (
+    center: Center
+  ) => void;
 };
+
+
 
 export default function CentersTable({
   centers,
   onAddCenter,
-}: Props) {
+  onEditCenter,
+}: Props)
+
+ {
   return (
     <div
       style={{
@@ -235,22 +244,32 @@ export default function CentersTable({
                         "16px",
                     }}
                   >
-                    <button
-                      style={{
-                        background:
-                          "#222",
-                        border:
-                          "1px solid #333",
-                        color:
-                          "#fff",
-                        borderRadius:
-                          "10px",
-                        padding:
-                          "8px 12px",
-                      }}
-                    >
-                      Edit
-                    </button>
+                    
+<button
+  onClick={() =>
+    onEditCenter(
+      center
+    )
+  }
+  style={{
+    background:
+      "#222",
+    border:
+      "1px solid #333",
+    color:
+      "#fff",
+    borderRadius:
+      "10px",
+    padding:
+      "8px 12px",
+    cursor:
+      "pointer",
+  }}
+>
+  Edit
+</button>
+
+
                   </td>
                 </tr>
               )
