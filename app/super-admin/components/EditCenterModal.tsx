@@ -89,12 +89,10 @@ export default function EditCenterModal({
               "Content-Type":
                 "application/json",
             },
-            body:
-              JSON.stringify({
-                id:
-                  center.id,
-                ...form,
-              }),
+            body: JSON.stringify({
+  id: center?.id,
+  ...form,
+}),
           }
         );
 
