@@ -199,9 +199,7 @@ setProducts(
 if (
   productsData?.length
 ) {
-  setSelectedProduct(
-    productsData[0].name
-  );
+ setSelectedProduct("");
 }
     }
   }
@@ -303,11 +301,18 @@ duration_years:
       alert(error.message);
       return;
     }
+alert(
+`✅ Warranty Added Successfully
 
+Customer: ${customerName}
+Roll Number: ${rollNumber}
+Product: ${selectedProduct}`
+);
     setCustomerName("");
     setVin("");
     setRollNumber("");
     setCity("");
+setSelectedProduct("");
 
     await loadWarranties();
   }
@@ -1452,6 +1457,9 @@ const pdfBlob = doc.output("blob");
       )
     }
   >
+<option value="">
+  Select Product
+</option>
     {products.map(
       (product) => (
     <option
