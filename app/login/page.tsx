@@ -27,6 +27,7 @@ export default function LoginPage() {
       password,
     });
 
+
   if (error) {
     setLoading(false);
     setMessage(error.message);
