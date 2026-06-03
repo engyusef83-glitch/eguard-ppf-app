@@ -63,6 +63,33 @@ console.log(
 
   setLoading(false);
 
+const {
+  data: center,
+} = await supabase
+  .from("centers")
+  .select("status")
+  .eq(
+    "user_id",
+    user.id
+  )
+  .single();
+
+if (
+  center?.status ===
+  "Suspended"
+) {
+  await supabase.auth.signOut();
+
+  setLoading(false);
+
+  setMessage(
+    "Your account has been suspended. Please contact EGUARD administration."
+  );
+
+  return;
+}
+
+
   console.log(
   "LOGIN PROFILE:",
   profile
