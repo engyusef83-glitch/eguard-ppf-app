@@ -9,6 +9,9 @@ import CentersTable from "./components/CentersTable";
 import AddCenterModal from "./components/AddCenterModal";
 import EditCenterModal from "./components/EditCenterModal";
 import ResetPasswordModal from "./components/ResetPasswordModal";
+import DeleteCenterModal from "./components/DeleteCenterModal";
+
+
 
 
 
@@ -54,6 +57,21 @@ const [
 ] = useState<any>(
   null
 );
+
+
+const [
+  showDeleteCenter,
+  setShowDeleteCenter,
+] = useState(false);
+
+const [
+  selectedDeleteCenter,
+  setSelectedDeleteCenter,
+] = useState<any>(
+  null
+);
+
+
 
 
   useEffect(() => {
@@ -253,6 +271,21 @@ const [
 
     setShowResetPassword(
       true
+
+ );
+  }}
+
+onDeleteCenter={(
+  center
+) => {
+  setSelectedDeleteCenter(
+    center
+  );
+
+  setShowDeleteCenter(
+    true
+ 
+
     );
   }}
 />
@@ -261,16 +294,23 @@ const [
 
 
 
-        <AddCenterModal
-          open={
-            showAddCenter
-          }
-          onClose={() =>
-            setShowAddCenter(
-              false
-            )
-          }
-        />
+      
+<AddCenterModal
+  open={
+    showAddCenter
+  }
+  onClose={() =>
+    setShowAddCenter(
+      false
+    )
+  }
+  onSuccess={
+    loadData
+  }
+/>
+
+
+
 
 
 <EditCenterModal
@@ -285,7 +325,12 @@ const [
       false
     )
   }
+  onSuccess={
+    loadData
+  }
 />
+
+
 
 <ResetPasswordModal
   open={
@@ -308,6 +353,37 @@ const [
     );
   }}
 />
+
+
+<DeleteCenterModal
+  open={
+    showDeleteCenter
+  }
+  centerId={
+    selectedDeleteCenter?.id
+  }
+  userId={
+    selectedDeleteCenter?.user_id
+  }
+  centerName={
+    selectedDeleteCenter?.center_name ||
+    ""
+  }
+  onClose={() => {
+    setShowDeleteCenter(
+      false
+    );
+
+    setSelectedDeleteCenter(
+      null
+    );
+  }}
+  onSuccess={
+    loadData
+  }
+/>
+
+
 
 
 

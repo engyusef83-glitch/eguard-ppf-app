@@ -12,6 +12,7 @@ type Center = {
 };
 
 
+
 type Props = {
   centers: Center[];
   onAddCenter: () => void;
@@ -21,9 +22,10 @@ type Props = {
   onResetPassword: (
     center: Center
   ) => void;
+  onDeleteCenter: (
+    center: Center
+  ) => void;
 };
-
-
 
 
 
@@ -32,7 +34,10 @@ export default function CentersTable({
   onAddCenter,
   onEditCenter,
   onResetPassword,
+  onDeleteCenter,
 }: Props)
+
+
 
 
 
@@ -247,6 +252,7 @@ export default function CentersTable({
                   </td>
 
               
+
 <td
   style={{
     padding:
@@ -259,6 +265,8 @@ export default function CentersTable({
         "flex",
       gap:
         "10px",
+      flexWrap:
+        "wrap",
     }}
   >
     <button
@@ -308,8 +316,34 @@ export default function CentersTable({
     >
       Reset Password
     </button>
+
+    <button
+      onClick={() =>
+        onDeleteCenter(
+          center
+        )
+      }
+      style={{
+        background:
+          "#ff4d4f",
+        border:
+          "none",
+        color:
+          "#fff",
+        borderRadius:
+          "10px",
+        padding:
+          "8px 12px",
+        cursor:
+          "pointer",
+      }}
+    >
+      Delete
+    </button>
   </div>
 </td>
+
+
 
 
                 </tr>

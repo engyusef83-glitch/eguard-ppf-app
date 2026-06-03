@@ -17,17 +17,25 @@ type Center = {
   status?: string;
 };
 
+
 type Props = {
   open: boolean;
   center: Center | null;
   onClose: () => void;
+  onSuccess: () => void;
 };
+
+
+
 
 export default function EditCenterModal({
   open,
   center,
   onClose,
-}: Props) {
+  onSuccess,
+}: Props){
+
+
   const [loading, setLoading] =
     useState(false);
 
@@ -116,7 +124,10 @@ export default function EditCenterModal({
 
       onClose();
 
-      window.location.reload();
+     
+onSuccess();
+
+
     } catch (
       error: any
     ) {
@@ -126,8 +137,8 @@ export default function EditCenterModal({
         error.message
       );
     }
-  }
-
+  
+}
   return (
     <div
       style={{

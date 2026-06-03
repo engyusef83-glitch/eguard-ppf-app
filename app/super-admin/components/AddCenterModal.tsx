@@ -3,15 +3,26 @@
 
 import { useState } from "react";
 
+
 type Props = {
   open: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 };
+
+
+
+
 
 export default function AddCenterModal({
   open,
   onClose,
+  onSuccess,
 }: Props) {
+
+
+
+
   const [loading, setLoading] =
     useState(false);
 
@@ -88,17 +99,20 @@ export default function AddCenterModal({
     }
   }
 
-  function handleClose() {
-    setGeneratedCredentials(
-      null
-    );
 
-    onClose();
+function handleClose() {
+  setGeneratedCredentials(
+    null
+  );
 
-    window.location.reload();
-  }
+  onClose();
 
-  return (
+  onSuccess();
+}
+
+return (
+
+
     <div
       style={{
         position:
