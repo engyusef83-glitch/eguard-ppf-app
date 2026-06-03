@@ -33,11 +33,6 @@ const governorates = [
   "Halabja",
 ];
 
-const products = [
-  { name: "PPF Bronze", years: 3 },
-  { name: "PPF Gold", years: 5 },
-  { name: "PPF Platinum", years: 7 },
-];
 
 type Warranty = {
   id: number;
@@ -79,7 +74,7 @@ export default function AdminPage() {
     useState("");
 
   const [selectedProduct, setSelectedProduct] =
-    useState(products[0].name);
+  useState("");
 
   const [warranties, setWarranties] =
     useState<Warranty[]>([]);
@@ -93,6 +88,8 @@ export default function AdminPage() {
     useState<"en" | "ar">("en");
   const [searchTerm, setSearchTerm] =
     useState("");
+const [products, setProducts] =
+  useState<any[]>([]);
 
 
   const t =
@@ -188,6 +185,24 @@ export default function AdminPage() {
       await loadWarranties(
         data.center_name
       );
+const {
+  data: productsData,
+} = await supabase
+  .from("products")
+  .select("*")
+  .order("name");
+
+setProducts(
+  productsData || []
+);
+
+if (
+  productsData?.length
+) {
+  setSelectedProduct(
+    productsData[0].name
+  );
+}
     }
   }
 
@@ -230,7 +245,7 @@ export default function AdminPage() {
 
     endDate.setFullYear(
       startDate.getFullYear() +
-        product.years
+        product.warranty_years
     );
 
     const start =
@@ -270,8 +285,8 @@ export default function AdminPage() {
             product_name:
               product.name,
 
-            duration_years:
-              product.years,
+duration_years:
+  product.warranty_years,
 
             start_date:
               start,
@@ -1117,9 +1132,9 @@ const pdfBlob = doc.output("blob");
         }
       />
 
-      </div>
+        </div>
 
-      {showVinScanner && (
+{showVinScanner && (
         <div
           style={{
             border: "2px solid #333",
@@ -1150,111 +1165,132 @@ const pdfBlob = doc.output("blob");
       <br />
       <br />
 
-      <div style={{
-        background:"#202020",
+      
+     <div
+  style={{
+    background:"#202020",
+    border:"1px solid #333",
+    borderRadius:"16px",
+    padding:"18px",
+    marginBottom:"18px"
+  }}
+>
+  <h3
+    style={{
+      color:"#fff",
+      marginBottom:"18px"
+    }}
+  >
+    Vehicle Information
+  </h3>
+
+  {/* VIN */}
+  <label
+    style={{
+      color:"#aaa",
+      display:"block",
+      marginBottom:"8px"
+    }}
+  >
+    VIN
+  </label>
+
+  <div
+    style={{
+      display:"flex",
+      gap:"10px",
+      alignItems:"center",
+      marginBottom:"20px"
+    }}
+  >
+    <input
+      type="text"
+      placeholder={t.vin}
+      value={vin}
+      onChange={(e) =>
+        setVin(
+          e.target.value
+        )
+      }
+      style={{
+        flex:1,
+        padding:"14px",
+        borderRadius:"12px",
         border:"1px solid #333",
-        borderRadius:"16px",
-        padding:"18px",
-        marginBottom:"18px"
-      }}>
-      <h3 style={{ color:"#fff", marginBottom:"10px" }}>
-        Vehicle Information
-      </h3>
+        fontSize:"16px",
+        color:"#fff",
+        background:"#222",
+      }}
+    />
 
-      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
-        VIN
-      </label>
+    <button
+      style={{
+        background:"#333",
+        color:"#fff",
+        borderRadius:"10px",
+        padding:"12px",
+      }}
+      onClick={() =>
+        startVinScanner()
+      }
+    >
+      {t.scanVin}
+    </button>
+  </div>
 
-      <h3 style={{ color:"#fff", marginBottom:"10px", marginTop:"20px" }}>
-        Roll Information
-      </h3>
+  {/* Roll */}
+  <label
+    style={{
+      color:"#aaa",
+      display:"block",
+      marginBottom:"8px"
+    }}
+  >
+    Roll Number
+  </label>
 
-      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
-        Roll Number
-      </label>
+  <div
+    style={{
+      display:"flex",
+      gap:"10px",
+      alignItems:"center"
+    }}
+  >
+    <input
+      type="text"
+      placeholder={t.roll}
+      value={rollNumber}
+      onChange={(e) =>
+        setRollNumber(
+          e.target.value
+        )
+      }
+      style={{
+        flex:1,
+        padding:"14px",
+        borderRadius:"12px",
+        border:"1px solid #333",
+        fontSize:"16px",
+        color:"#fff",
+        background:"#222",
+      }}
+    />
 
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          alignItems: "center",
-        }}
-      >
-        <input
-          type="text"
-          placeholder={t.vin}
-          value={vin}
-          onChange={(e) =>
-            setVin(
-              e.target.value
-            )
-          }
-          style={{
-            flex: 1,
-            padding: "14px",
-            borderRadius: "12px",
-            border: "1px solid #333",
-            fontSize: "16px",
-          color: "#fff",
-          background: "#222",
-          }}
-        />
-
-        <button
-          style={{ background:"#333", color:"#fff", borderRadius:"10px", padding:"12px" }}
-          onClick={() =>
-            startVinScanner()
-          }
-        >
-          {t.scanVin}
-        </button>
-      </div>
-
-      <br />
-      <br />
-
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          alignItems: "center",
-        }}
-      >
-        <input
-          type="text"
-          placeholder={t.roll}
-          value={rollNumber}
-          onChange={(e) =>
-            setRollNumber(
-              e.target.value
-            )
-          }
-          style={{
-            flex: 1,
-            padding: "14px",
-            borderRadius: "12px",
-            border: "1px solid #333",
-            fontSize: "16px",
-          color: "#fff",
-          background: "#222",
-          }}
-        />
-
-        <button
-          style={{ background:"#333", color:"#fff", borderRadius:"10px", padding:"12px" }}
-          onClick={() =>
-            startRollScanner()
-          }
-        >
-          {t.scanRoll}
-        </button>
-      </div>
-
-      <br />
-      <br />
-
-      </div>
-
+    <button
+      style={{
+        background:"#333",
+        color:"#fff",
+        borderRadius:"10px",
+        padding:"12px",
+      }}
+      onClick={() =>
+        startRollScanner()
+      }
+    >
+      {t.scanRoll}
+    </button>
+  </div>
+</div>
       {showRollScanner && (
         <div
           style={{
@@ -1283,150 +1319,171 @@ const pdfBlob = doc.output("blob");
         </div>
       )}
 
-      <div style={{
-        background:"#202020",
-        border:"1px solid #333",
-        borderRadius:"16px",
-        padding:"18px",
-        marginBottom:"18px"
-      }}>
-      <h3 style={{ color:"#fff" }}>
-        Location
-      </h3>
+      
+     
+     
+<div
+  style={{
+    background:"#202020",
+    border:"1px solid #333",
+    borderRadius:"16px",
+    padding:"18px",
+    marginBottom:"18px"
+  }}
+>
+  <h3 style={{ color:"#fff" }}>
+    Location
+  </h3>
 
-      <p style={{ color: "#fff" }}>
-        {t.country}
-      </p>
+  <p style={{ color:"#fff" }}>
+    {t.country}
+  </p>
 
-      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
-        Governorate
-      </label>
+  <label
+    style={{
+      color:"#aaa",
+      display:"block",
+      marginBottom:"8px"
+    }}
+  >
+    Governorate
+  </label>
 
-      <h3 style={{ color:"#fff", marginTop:"20px" }}>
-        Product
-      </h3>
+  <select
+    style={{
+      width: "100%",
+      padding: "14px",
+      borderRadius: "12px",
+      border: "1px solid #333",
+      fontSize: "16px",
+      color: "#fff",
+      background: "#222",
+    }}
+    value={governorate}
+    onChange={(e) =>
+      setGovernorate(
+        e.target.value
+      )
+    }
+  >
+    {governorates.map(
+      (gov) => (
+        <option
+          key={gov}
+          value={gov}
+        >
+          {gov}
+        </option>
+      )
+    )}
+  </select>
 
-      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
-        Product Type
-      </label>
+  <br />
+  <br />
 
-      <select
-        style={{
-          width: "100%",
-          padding: "14px",
-          borderRadius: "12px",
-          border: "1px solid #333",
-          fontSize: "16px",
-          color: "#fff",
-          background: "#222",
-        }}
-        value={governorate}
-        onChange={(e) =>
-          setGovernorate(
-            e.target.value
-          )
-        }
-      >
-        {governorates.map(
-          (gov) => (
-            <option
-              key={gov}
-              value={gov}
-            >
-              {gov}
-            </option>
-          )
-        )}
-      </select>
+  <label
+    style={{
+      color:"#aaa",
+      display:"block",
+      marginBottom:"8px"
+    }}
+  >
+    City
+  </label>
 
-      <br />
-      <br />
+  <input
+    type="text"
+    placeholder={t.city}
+    style={{
+      width: "100%",
+      padding: "14px",
+      borderRadius: "12px",
+      border: "1px solid #333",
+      fontSize: "16px",
+      color: "#fff",
+      background: "#222",
+    }}
+    value={city}
+    onChange={(e) =>
+      setCity(
+        e.target.value
+      )
+    }
+  />
+</div>
 
-      <label style={{ color:"#aaa", display:"block", marginBottom:"8px" }}>
-        City
-      </label>
+<div
+  style={{
+    background:"#202020",
+    border:"1px solid #333",
+    borderRadius:"16px",
+    padding:"18px",
+    marginBottom:"18px"
+  }}
+>
+  <h3 style={{ color:"#fff" }}>
+    Product
+  </h3>
 
-      <input
-        type="text"
-        placeholder={t.city}
-        style={{
-          width: "100%",
-          padding: "14px",
-          borderRadius: "12px",
-          border: "1px solid #333",
-          fontSize: "16px",
-          color: "#fff",
-          background: "#222",
-        }}
-        value={city}
-        onChange={(e) =>
-          setCity(
-            e.target.value
-          )
-        }
-      />
+  <label
+    style={{
+      color:"#aaa",
+      display:"block",
+      marginBottom:"8px"
+    }}
+  >
+    Product Type
+  </label>
 
-      <br />
-      <br />
+  <select
+    style={{
+      width: "100%",
+      padding: "14px",
+      borderRadius: "12px",
+      border: "1px solid #333",
+      fontSize: "16px",
+      color: "#fff",
+      background: "#222",
+    }}
+    value={selectedProduct}
+    onChange={(e) =>
+      setSelectedProduct(
+        e.target.value
+      )
+    }
+  >
+    {products.map(
+      (product) => (
+    <option
+  key={product.id}
+  value={product.name}
+>
+  {product.name}
+  {" - "}
+  {product.warranty_years} Years
+</option>
+      )
+    )}
+  </select>
+</div>
 
-      <select
-        style={{
-          width: "100%",
-          padding: "14px",
-          borderRadius: "12px",
-          border: "1px solid #333",
-          fontSize: "16px",
-          color: "#fff",
-          background: "#222",
-        }}
-        value={
-          selectedProduct
-        }
-        onChange={(e) =>
-          setSelectedProduct(
-            e.target.value
-          )
-        }
-      >
-        {products.map(
-          (product) => (
-            <option
-              key={
-                product.name
-              }
-              value={
-                product.name
-              }
-            >
-              {product.name}
-              {" - "}
-              {
-                product.years
-              }{" "}
-              Years
-            </option>
-          )
-        )}
-      </select>
 
-      <br />
-      <br />
-
-      </div>
-
-      <button
-        onClick={addWarranty}
-        style={{
-          width: "100%",
-          padding: "16px",
-          borderRadius: "12px",
-          fontSize: "18px",
-          fontWeight: "bold",
-          background: "#fff",
-        }}
-      >
-        {t.add}
-      </button>
+        <button
+  onClick={addWarranty}
+  style={{
+    width: "100%",
+    padding: "14px",
+    borderRadius: "12px",
+    border: "none",
+    fontSize: "16px",
+    background: "#24A444",
+    color: "#fff",
+    cursor: "pointer",
+    marginBottom: "20px",
+  }}
+>
+  {t.add}
+</button>
 
       <hr />
 
@@ -1605,7 +1662,7 @@ const pdfBlob = doc.output("blob");
   Share
 </button>
 
-              <button
+                           <button
                 style={{
                   background:"#7a1f1f",
                   color:"#fff",
@@ -1622,9 +1679,10 @@ const pdfBlob = doc.output("blob");
               </button>
             </div>
           </div>
-        )
-      )}
-          </div>
+        ))
+      }
+
+      </div>
     </div>
   );
 }
