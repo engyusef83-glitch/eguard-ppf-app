@@ -338,21 +338,28 @@ async function exportWarranties() {
           item.vin ||
           "",
 
-        "Installation Date":
-          item.installation_date ||
-          "",
+        
 
-        "Roll ID":
-          item.roll_id ||
-          "",
+"Installation Date":
+  item.start_date ||
+  "",
 
-        "Roll Type":
-          item.roll_type ||
-          "",
+"Roll ID":
+  item.roll_number ||
+  "",
 
-        "Warranty Period":
-          item.warranty_period ||
-          "",
+"Roll Type":
+  item.product_name ||
+  "",
+
+"Warranty Period":
+  item.duration_years
+    ? `${item.duration_years} Years`
+    : "",
+
+
+
+
 
         Governorate:
           item.governorate ||
