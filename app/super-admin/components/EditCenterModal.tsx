@@ -184,122 +184,191 @@ onSuccess();
           Edit Center
         </h2>
 
-        <div
-          style={{
-            display:
-              "grid",
-            gridTemplateColumns:
-              "1fr 1fr",
-            gap:
-              "16px",
-          }}
+      
+<div
+  style={{
+    display:
+      "grid",
+    gridTemplateColumns:
+      "1fr 1fr",
+    gap:
+      "16px",
+  }}
+>
+  {[
+    [
+      "center_name",
+      "Center Name",
+    ],
+    [
+      "email",
+      "Email",
+    ],
+    [
+      "phone",
+      "Phone",
+    ],
+    [
+      "city",
+      "City",
+    ],
+    [
+      "address",
+      "Address",
+    ],
+  ].map(
+    ([
+      key,
+      label,
+    ]) => (
+      <input
+        key={key}
+        placeholder={
+          label
+        }
+        value={
+          (
+            form as any
+          )[key]
+        }
+        onChange={(
+          e
+        ) =>
+          setForm({
+            ...form,
+            [key]:
+              e.target
+                .value,
+          })
+        }
+        style={{
+          background:
+            "#222",
+          border:
+            "1px solid #333",
+          borderRadius:
+            "12px",
+          padding:
+            "16px",
+          color:
+            "#fff",
+        }}
+      />
+    )
+  )}
+
+  <select
+    value={
+      form.status
+    }
+    onChange={(
+      e
+    ) =>
+      setForm({
+        ...form,
+        status:
+          e.target
+            .value,
+      })
+    }
+    style={{
+      background:
+        "#222",
+      border:
+        "1px solid #333",
+      borderRadius:
+        "12px",
+      padding:
+        "16px",
+      color:
+        "#fff",
+    }}
+  >
+    <option>
+      Active
+    </option>
+
+    <option>
+      Suspended
+    </option>
+  </select>
+
+  <select
+    value={
+      form.governorate
+    }
+    onChange={(
+      e
+    ) =>
+      setForm({
+        ...form,
+        governorate:
+          e.target
+            .value,
+      })
+    }
+    style={{
+      background:
+        "#222",
+      border:
+        "1px solid #333",
+      borderRadius:
+        "12px",
+      padding:
+        "16px",
+      color:
+        "#fff",
+      width:
+        "100%",
+    }}
+  >
+    <option value="">
+      Select Governorate
+    </option>
+
+    {[
+      "Baghdad",
+      "Basra",
+      "Erbil",
+      "Sulaymaniyah",
+      "Duhok",
+      "Halabja",
+      "Nineveh",
+      "Kirkuk",
+      "Anbar",
+      "Salah al-Din",
+      "Diyala",
+      "Babil",
+      "Karbala",
+      "Najaf",
+      "Wasit",
+      "Maysan",
+      "Dhi Qar",
+      "Muthanna",
+      "Qadisiyyah",
+    ].map(
+      (
+        governorate
+      ) => (
+        <option
+          key={
+            governorate
+          }
+          value={
+            governorate
+          }
         >
-          {[
-            [
-              "center_name",
-              "Center Name",
-            ],
-            [
-              "email",
-              "Email",
-            ],
-            [
-              "phone",
-              "Phone",
-            ],
-            [
-              "governorate",
-              "Governorate",
-            ],
-            [
-              "city",
-              "City",
-            ],
-            [
-              "address",
-              "Address",
-            ],
-          ].map(
-            (
-              [
-                key,
-                label,
-              ]
-            ) => (
-              <input
-                key={
-                  key
-                }
-                placeholder={
-                  label
-                }
-                value={
-                  (
-                    form as any
-                  )[key]
-                }
-                onChange={(
-                  e
-                ) =>
-                  setForm({
-                    ...form,
-                    [key]:
-                      e.target
-                        .value,
-                  })
-                }
-                style={{
-                  background:
-                    "#222",
-                  border:
-                    "1px solid #333",
-                  borderRadius:
-                    "12px",
-                  padding:
-                    "16px",
-                  color:
-                    "#fff",
-                }}
-              />
-            )
-          )}
+          {
+            governorate
+          }
+        </option>
+      )
+    )}
+  </select>
+</div>
 
-          <select
-            value={
-              form.status
-            }
-            onChange={(
-              e
-            ) =>
-              setForm({
-                ...form,
-                status:
-                  e.target
-                    .value,
-              })
-            }
-            style={{
-              background:
-                "#222",
-              border:
-                "1px solid #333",
-              borderRadius:
-                "12px",
-              padding:
-                "16px",
-              color:
-                "#fff",
-            }}
-          >
-            <option>
-              Active
-            </option>
 
-            <option>
-              Suspended
-            </option>
-          </select>
-        </div>
+
 
         <div
           style={{

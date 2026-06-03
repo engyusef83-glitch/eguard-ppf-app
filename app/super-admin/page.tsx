@@ -72,6 +72,20 @@ const [
 );
 
 
+const [search, setSearch] =
+  useState("");
+
+const [
+  statusFilter,
+  setStatusFilter,
+] = useState("All");
+
+const [
+  governorateFilter,
+  setGovernorateFilter,
+] = useState("All");
+
+
 
 
   useEffect(() => {
@@ -185,6 +199,37 @@ const [
     });
   }
 
+const filteredCenters =
+  centers.filter(
+    (center) => {
+      const matchSearch =
+        center.center_name
+          ?.toLowerCase()
+          .includes(
+            search.toLowerCase()
+          );
+
+      const matchStatus =
+        statusFilter ===
+          "All" ||
+        center.status ===
+          statusFilter;
+
+      const matchGovernorate =
+        governorateFilter ===
+          "All" ||
+        center.governorate ===
+          governorateFilter;
+
+      return (
+        matchSearch &&
+        matchStatus &&
+        matchGovernorate
+      );
+    }
+  );
+
+
   async function logout() {
     await supabase.auth.signOut();
     router.push("/login");
@@ -242,10 +287,158 @@ const [
           stats={stats}
         />
 
+
+<div
+  style={{
+    display:
+      "flex",
+    gap:
+      "16px",
+    marginBottom:
+      "24px",
+    flexWrap:
+      "wrap",
+  }}
+>
+  <input
+    placeholder="Search center..."
+    value={search}
+    onChange={(e) =>
+      setSearch(
+        e.target.value
+      )
+    }
+    style={{
+      flex:
+        "1",
+      minWidth:
+        "260px",
+      background:
+        "#1b1b1b",
+      border:
+        "1px solid #333",
+      borderRadius:
+        "12px",
+      padding:
+        "14px",
+      color:
+        "#fff",
+    }}
+  />
+
+  <select
+    value={
+      statusFilter
+    }
+    onChange={(e) =>
+      setStatusFilter(
+        e.target.value
+      )
+    }
+    style={{
+      background:
+        "#1b1b1b",
+      border:
+        "1px solid #333",
+      borderRadius:
+        "12px",
+      padding:
+        "14px",
+      color:
+        "#fff",
+      minWidth:
+        "180px",
+    }}
+  >
+    <option>
+      All
+    </option>
+
+    <option>
+      Active
+    </option>
+
+    <option>
+      Suspended
+    </option>
+  </select>
+
+  <select
+    value={
+      governorateFilter
+    }
+    onChange={(e) =>
+      setGovernorateFilter(
+        e.target.value
+      )
+    }
+    style={{
+      background:
+        "#1b1b1b",
+      border:
+        "1px solid #333",
+      borderRadius:
+        "12px",
+      padding:
+        "14px",
+      color:
+        "#fff",
+      minWidth:
+        "220px",
+    }}
+  >
+    <option>
+      All
+    </option>
+
+    {[
+      "Baghdad",
+      "Basra",
+      "Erbil",
+      "Sulaymaniyah",
+      "Duhok",
+      "Halabja",
+      "Nineveh",
+      "Kirkuk",
+      "Anbar",
+      "Salah al-Din",
+      "Diyala",
+      "Babil",
+      "Karbala",
+      "Najaf",
+      "Wasit",
+      "Maysan",
+      "Dhi Qar",
+      "Muthanna",
+      "Qadisiyyah",
+    ].map(
+      (
+        governorate
+      ) => (
+        <option
+          key={
+            governorate
+          }
+        >
+          {
+            governorate
+          }
+        </option>
+      )
+    )}
+  </select>
+</div>
+
+
        
 
 <CentersTable
-  centers={centers}
+  
+centers={
+  filteredCenters
+}
+
+
   onAddCenter={() =>
     setShowAddCenter(
       true
