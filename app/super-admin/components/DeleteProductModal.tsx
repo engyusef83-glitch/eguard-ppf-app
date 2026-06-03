@@ -54,7 +54,9 @@ export default function DeleteProductModal({
           .delete()
           .eq(
             "id",
-            product.id
+product?.id
+
+
           );
 
       if (error)
