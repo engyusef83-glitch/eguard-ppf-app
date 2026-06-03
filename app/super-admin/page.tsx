@@ -10,6 +10,10 @@ import AddCenterModal from "./components/AddCenterModal";
 import EditCenterModal from "./components/EditCenterModal";
 import ResetPasswordModal from "./components/ResetPasswordModal";
 import DeleteCenterModal from "./components/DeleteCenterModal";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
+
 
 
 
@@ -230,6 +234,178 @@ const filteredCenters =
   );
 
 
+
+function exportCenters() {
+  const excelData =
+    filteredCenters.map(
+      (center) => ({
+        "Center Name":
+          center.center_name ||
+          "",
+
+        Email:
+          center.email ||
+          "",
+
+        Phone:
+          center.phone ||
+          "",
+
+        Governorate:
+          center.governorate ||
+          "",
+
+        City:
+          center.city ||
+          "",
+
+        Status:
+          center.status ||
+          "",
+
+        "Created At":
+          center.created_at
+            ? new Date(
+                center.created_at
+              ).toLocaleString()
+            : "",
+      })
+    );
+
+  const worksheet =
+    XLSX.utils.json_to_sheet(
+      excelData
+    );
+
+  const workbook =
+    XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Centers"
+  );
+
+  const excelBuffer =
+    XLSX.write(
+      workbook,
+      {
+        bookType:
+          "xlsx",
+        type:
+          "array",
+      }
+    );
+
+  const file =
+    new Blob(
+      [excelBuffer],
+      {
+        type:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      }
+    );
+
+  saveAs(
+    file,
+    "centers.xlsx"
+  );
+}
+
+
+async function exportWarranties() {
+  const {
+    data: warranties,
+  } = await supabase
+    .from(
+      "warranties"
+    )
+    .select("*");
+
+  const excelData =
+    (
+      warranties || []
+    ).map(
+      (item) => ({
+        Timestamp:
+          item.created_at
+            ? new Date(
+                item.created_at
+              ).toLocaleString()
+            : "",
+
+        "Vehicle Chassis Number (VIN)":
+          item.vin ||
+          "",
+
+        "Installation Date":
+          item.installation_date ||
+          "",
+
+        "Roll ID":
+          item.roll_id ||
+          "",
+
+        "Roll Type":
+          item.roll_type ||
+          "",
+
+        "Warranty Period":
+          item.warranty_period ||
+          "",
+
+        Governorate:
+          item.governorate ||
+          "",
+
+        Country:
+          item.country ||
+          "Iraq",
+      })
+    );
+
+  const worksheet =
+    XLSX.utils.json_to_sheet(
+      excelData
+    );
+
+  const workbook =
+    XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Warranties"
+  );
+
+  const excelBuffer =
+    XLSX.write(
+      workbook,
+      {
+        bookType:
+          "xlsx",
+        type:
+          "array",
+      }
+    );
+
+  const file =
+    new Blob(
+      [excelBuffer],
+      {
+        type:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      }
+    );
+
+  saveAs(
+    file,
+    "eguard_warranties.xlsx"
+  );
+}
+
+
+
   async function logout() {
     await supabase.auth.signOut();
     router.push("/login");
@@ -286,6 +462,73 @@ const filteredCenters =
         <StatsCards
           stats={stats}
         />
+
+
+<div
+  style={{
+    display:
+      "flex",
+    justifyContent:
+      "flex-end",
+    marginBottom:
+      "20px",
+  }}
+>
+  <button
+    onClick={
+      exportCenters
+    }
+    style={{
+      background:
+        "#24a444",
+      color:
+        "#fff",
+      border:
+        "none",
+      borderRadius:
+        "12px",
+      padding:
+        "14px 18px",
+      cursor:
+        "pointer",
+      fontWeight:
+        "bold",
+    }}
+  >
+    Export Centers
+  </button>
+
+
+<button
+  onClick={
+    exportWarranties
+  }
+  style={{
+    background:
+      "#1e88e5",
+    color:
+      "#fff",
+    border:
+      "none",
+    borderRadius:
+      "12px",
+    padding:
+      "14px 18px",
+    cursor:
+      "pointer",
+    fontWeight:
+      "bold",
+    marginLeft:
+      "12px",
+  }}
+>
+  Export Warranties
+</button>
+
+
+</div>
+
+
 
 
 <div
