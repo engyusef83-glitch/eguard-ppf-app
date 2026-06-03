@@ -12,6 +12,12 @@ import ResetPasswordModal from "./components/ResetPasswordModal";
 import DeleteCenterModal from "./components/DeleteCenterModal";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import ProductsTable from "./components/ProductsTable";
+import AddProductModal from "./components/AddProductModal";
+import EditProductModal from "./components/EditProductModal";
+import DeleteProductModal from "./components/DeleteProductModal";
+
+
 
 
 
@@ -74,6 +80,32 @@ const [
 ] = useState<any>(
   null
 );
+
+const [products, setProducts] =
+  useState<any[]>([]);
+
+const [
+  showAddProduct,
+  setShowAddProduct,
+] = useState(false);
+
+const [
+  showEditProduct,
+  setShowEditProduct,
+] = useState(false);
+
+const [
+  selectedProduct,
+  setSelectedProduct,
+] = useState<any>(
+  null
+);
+
+const [
+  showDeleteProduct,
+  setShowDeleteProduct,
+] = useState(false);
+
 
 
 const [search, setSearch] =
@@ -176,6 +208,19 @@ const [
       centersData ||
         []
     );
+
+const {
+  data: productsData,
+} = await supabase
+  .from("products")
+  .select("*")
+  .order("name");
+
+setProducts(
+  productsData ||
+    []
+);
+
 
     const active =
       warranties?.filter(
@@ -733,6 +778,88 @@ onDeleteCenter={(
   }}
 />
 
+<div
+  style={{
+    marginTop:
+      "40px",
+  }}
+>
+  <div
+    style={{
+      display:
+        "flex",
+      justifyContent:
+        "space-between",
+      alignItems:
+        "center",
+      marginBottom:
+        "20px",
+    }}
+  >
+    <h2
+      style={{
+        color:
+          "#fff",
+      }}
+    >
+      Products
+    </h2>
+
+    <button
+      onClick={() =>
+        setShowAddProduct(
+          true
+        )
+      }
+      style={{
+        background:
+          "#24a444",
+        color:
+          "#fff",
+        border:
+          "none",
+        borderRadius:
+          "12px",
+        padding:
+          "12px 18px",
+        cursor:
+          "pointer",
+      }}
+    >
+      Add Product
+    </button>
+  </div>
+
+  <ProductsTable
+    products={
+      products
+    }
+    onEditProduct={(
+      product
+    ) => {
+      setSelectedProduct(
+        product
+      );
+
+      setShowEditProduct(
+        true
+      );
+    }}
+    onDeleteProduct={(
+      product
+    ) => {
+      setSelectedProduct(
+        product
+      );
+
+      setShowDeleteProduct(
+        true
+      );
+    }}
+  />
+</div>
+
+
 
 
 
@@ -821,6 +948,55 @@ onDeleteCenter={(
       null
     );
   }}
+  onSuccess={
+    loadData
+  }
+/>
+
+
+<AddProductModal
+  open={
+    showAddProduct
+  }
+  onClose={() =>
+    setShowAddProduct(
+      false
+    )
+  }
+  onSuccess={
+    loadData
+  }
+/>
+
+<EditProductModal
+  open={
+    showEditProduct
+  }
+  product={
+    selectedProduct
+  }
+  onClose={() =>
+    setShowEditProduct(
+      false
+    )
+  }
+  onSuccess={
+    loadData
+  }
+/>
+
+<DeleteProductModal
+  open={
+    showDeleteProduct
+  }
+  product={
+    selectedProduct
+  }
+  onClose={() =>
+    setShowDeleteProduct(
+      false
+    )
+  }
   onSuccess={
     loadData
   }
