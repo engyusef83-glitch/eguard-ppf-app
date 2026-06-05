@@ -577,6 +577,33 @@ async function exportWarranties() {
   Export Warranties
 </button>
 
+<button
+  onClick={() =>
+    window.location.href =
+      "/super-admin/roll-inventory"
+  }
+  style={{
+    background:
+      "#ff9800",
+    color:
+      "#fff",
+    border:
+      "none",
+    borderRadius:
+      "12px",
+    padding:
+      "14px 18px",
+    cursor:
+      "pointer",
+    fontWeight:
+      "bold",
+    marginLeft:
+      "12px",
+  }}
+>
+  Roll Inventory
+</button>
+
 
 </div>
 
