@@ -40,9 +40,13 @@ const [sheetSummary, setSheetSummary] =
 const [parsedRolls, setParsedRolls] =
   useState<any[]>([]);
 
+const [importHistory, setImportHistory] =
+  useState<any[]>([]);
+
   useEffect(() => {
-  loadSettings();
   loadStats();
+  loadSettings();
+  loadImportHistory();
 }, []);
 
   async function loadSettings() {
@@ -202,40 +206,105 @@ async function confirmImport() {
       })
     );
 
-  console.log(
-    "ROWS TO INSERT =",
-    rowsToInsert.slice(0, 10)
-  );
+  const beforeResult =
+    await supabase
+      .from("roll_inventory")
+      .select("*", {
+        count: "exact",
+        head: true,
+      });
+
+  const beforeCount =
+    beforeResult.count || 0;
 
   const { error } =
-  await supabase
-    .from("roll_inventory")
-    .upsert(
-      rowsToInsert,
-      {
-        onConflict:
-          "roll_number",
-        ignoreDuplicates: true,
-      }
+    await supabase
+      .from("roll_inventory")
+      .upsert(
+        rowsToInsert,
+        {
+          onConflict:
+            "roll_number",
+          ignoreDuplicates: true,
+        }
+      );
+
+  if (error) {
+    console.error(error);
+
+    alert(
+      "Import Failed"
     );
 
-if (error) {
-  console.error(error);
+    return;
+  }
+
+  const afterResult =
+    await supabase
+      .from("roll_inventory")
+      .select("*", {
+        count: "exact",
+        head: true,
+      });
+
+  const afterCount =
+    afterResult.count || 0;
+
+  const importedRows =
+    afterCount - beforeCount;
+
+  const duplicatesSkipped =
+    rowsToInsert.length -
+    importedRows;
+
+  await supabase
+    .from("roll_import_history")
+    .insert({
+      file_name:
+        selectedFile?.name || "",
+
+      uploaded_by:
+        "super_admin",
+
+      total_rows:
+        rowsToInsert.length,
+
+      imported_rows:
+        importedRows,
+
+      duplicates_skipped:
+        duplicatesSkipped,
+
+      auto_fixed_matches: 0,
+    });
 
   alert(
-    "Import Failed"
+    `Import Completed
+
+Total Rows: ${rowsToInsert.length}
+
+Imported: ${importedRows}
+
+Duplicates: ${duplicatesSkipped}`
   );
 
-  return;
+  loadStats();
+loadImportHistory();
 }
 
-alert(
-  `Import Completed
+async function loadImportHistory() {
+  const { data, error } =
+    await supabase
+      .from("roll_import_history")
+      .select("*")
+      .order("uploaded_at", {
+        ascending: false,
+      })
+      .limit(20);
 
-Rows: ${rowsToInsert.length}`
-);
-
-loadStats();
+  if (!error && data) {
+    setImportHistory(data);
+  }
 }
   return (
     <div
@@ -549,6 +618,77 @@ loadStats();
 >
   Confirm Import
 </button>
+
+{importHistory.length > 0 && (
+  <div
+    style={{
+      marginTop: "30px",
+      padding: "20px",
+      border: "1px solid #333",
+      borderRadius: "12px",
+      background: "#111",
+    }}
+  >
+    <h3
+      style={{
+        marginBottom: "20px",
+      }}
+    >
+      Import History
+    </h3>
+
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+      }}
+    >
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Total</th>
+          <th>Imported</th>
+          <th>Duplicates</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {importHistory.map(
+          (item) => (
+            <tr
+              key={item.id}
+            >
+              <td>
+                {item.file_name}
+              </td>
+
+              <td>
+                {item.total_rows}
+              </td>
+
+              <td>
+                {item.imported_rows}
+              </td>
+
+              <td>
+                {
+                  item.duplicates_skipped
+                }
+              </td>
+
+              <td>
+                {new Date(
+                  item.uploaded_at
+                ).toLocaleString()}
+              </td>
+            </tr>
+          )
+        )}
+      </tbody>
+    </table>
+  </div>
+)}
     </div>
   </div>
 )}
