@@ -37,6 +37,9 @@ const [sheetSummary, setSheetSummary] =
     }[]
   >([]);
 
+const [parsedRolls, setParsedRolls] =
+  useState<any[]>([]);
+
   useEffect(() => {
   loadSettings();
   loadStats();
@@ -118,6 +121,7 @@ async function previewExcel() {
     });
 
   const summary = [];
+const allRolls: any[] = [];
 
   for (const sheetName of workbook.SheetNames) {
     const sheet =
@@ -140,6 +144,17 @@ async function previewExcel() {
           row[1]
       );
 
+for (let i = 1; i < validRows.length; i++) {
+  allRolls.push({
+    product_name: validRows[i][0],
+    roll_number: String(
+      validRows[i][1]
+    ),
+    sheet_name: sheetName,
+  });
+
+}
+
     summary.push({
       name: sheetName,
       count: Math.max(
@@ -151,26 +166,74 @@ async function previewExcel() {
 
   console.log("SUMMARY =", summary);
 
-  setSheetSummary(summary);
+setParsedRolls(allRolls);
+
+console.log(
+  "PARSED ROLLS =",
+  allRolls
+);
+
+setSheetSummary(summary);
 }
 
 async function confirmImport() {
-  if (!selectedFile) return;
+  if (parsedRolls.length === 0) {
+    alert("No rolls to import");
+    return;
+  }
 
-  const totalRows = sheetSummary.reduce(
-    (sum, item) => sum + item.count,
-    0
+  const rowsToInsert =
+    parsedRolls.map(
+      (roll) => ({
+        roll_number:
+          roll.roll_number,
+
+        product_name:
+          roll.product_name,
+
+        source_file:
+          selectedFile?.name || "",
+
+        sheet_name:
+          roll.sheet_name,
+      })
+    );
+
+  console.log(
+    "ROWS TO INSERT =",
+    rowsToInsert.slice(0, 10)
   );
+
+  const { error } =
+  await supabase
+    .from("roll_inventory")
+    .upsert(
+      rowsToInsert,
+      {
+        onConflict:
+          "roll_number",
+        ignoreDuplicates: true,
+      }
+    );
+
+if (error) {
+  console.error(error);
 
   alert(
-    `File Ready
-
-Sheets: ${sheetSummary.length}
-
-Total Rolls: ${totalRows}`
+    "Import Failed"
   );
+
+  return;
 }
 
+alert(
+  `Import Completed
+
+Rows: ${rowsToInsert.length}`
+);
+
+loadStats();
+}
   return (
     <div
       style={{
@@ -468,6 +531,7 @@ Total Rolls: ${totalRows}`
       style={{
         marginTop: "20px",
       }}
+
     ><button
   onClick={confirmImport}
   style={{
