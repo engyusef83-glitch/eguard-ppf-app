@@ -145,14 +145,17 @@ const allRolls: any[] = [];
       );
 
 for (let i = 1; i < validRows.length; i++) {
+  const row = validRows[i] as any[];
+
   allRolls.push({
-    product_name: validRows[i][0],
+    product_name: String(row[0] || ""),
+
     roll_number: String(
-      validRows[i][1]
+      row[1] || ""
     ),
+
     sheet_name: sheetName,
   });
-
 }
 
     summary.push({
