@@ -256,6 +256,19 @@ if (
         .toISOString()
         .split("T")[0];
 
+const { data: inventoryRoll } =
+  await supabase
+    .from("roll_inventory")
+    .select("id")
+    .eq(
+      "roll_number",
+      rollNumber
+    )
+    .maybeSingle();
+
+const inventoryMatch =
+  !!inventoryRoll;
+
     const { error } =
       await supabase
         .from("warranties")
@@ -291,9 +304,21 @@ duration_years:
 
             end_date:
               end,
+inventory_match:
+  inventoryMatch,
 
-            status:
-              "Active",
+inventory_status:
+  inventoryMatch
+    ? "matched"
+    : "unmatched",
+
+inventory_checked_at:
+  new Date()
+    .toISOString(),
+
+status:
+  "Active",
+
           },
         ]);
 
@@ -301,6 +326,9 @@ duration_years:
       alert(error.message);
       return;
     }
+
+
+
 alert(
 `✅ Warranty Added Successfully
 

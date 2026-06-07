@@ -43,10 +43,22 @@ const [parsedRolls, setParsedRolls] =
 const [importHistory, setImportHistory] =
   useState<any[]>([]);
 
+const [
+  inventoryReport,
+  setInventoryReport,
+] = useState<any[]>([]);
+
+const [searchRoll, setSearchRoll] =
+  useState("");
+
+const [statusFilter, setStatusFilter] =
+  useState("all");
+
   useEffect(() => {
   loadStats();
   loadSettings();
   loadImportHistory();
+loadInventoryReport();
 }, []);
 
   async function loadSettings() {
@@ -76,14 +88,36 @@ async function loadStats() {
         head: true,
       });
 
+const importHistoryCount =
+  await supabase
+    .from("roll_import_history")
+    .select("*", {
+      count: "exact",
+      head: true,
+    });
+
+const unmatchedCount =
+  await supabase
+    .from("warranties")
+    .select("*", {
+      count: "exact",
+      head: true,
+    })
+    .eq(
+      "inventory_status",
+      "unmatched"
+    );
+
   setStats({
-    totalRolls:
-      count || 0,
+  totalRolls:
+    count || 0,
 
-    importedFiles: 0,
+  importedFiles:
+    importHistoryCount.count || 0,
 
-    unmatched: 0,
-  });
+  unmatched:
+  unmatchedCount.count || 0,
+});
 }
 
 async function updateMode(
@@ -306,6 +340,29 @@ async function loadImportHistory() {
     setImportHistory(data);
   }
 }
+
+async function loadInventoryReport() {
+  const { data } =
+    await supabase
+      .from("warranties")
+      .select(
+        `
+        customer_name,
+        roll_number,
+        product_name,
+        inventory_status
+      `
+      )
+      .order("id", {
+        ascending: false,
+      })
+      .limit(20);
+
+  setInventoryReport(
+    data || []
+  );
+}
+
   return (
     <div
       style={{
@@ -429,7 +486,7 @@ async function loadImportHistory() {
       {stats.totalRolls}
     </h1>
   </div>
-</div>
+
 <div
   style={{
     background: "#1b1b1b",
@@ -482,6 +539,7 @@ async function loadImportHistory() {
   >
     {stats.unmatched}
   </h1>
+</div>
 </div>
 
 <div
@@ -644,45 +702,82 @@ async function loadImportHistory() {
       }}
     >
       <thead>
-        <tr>
-          <th>File</th>
-          <th>Total</th>
-          <th>Imported</th>
-          <th>Duplicates</th>
-          <th>Date</th>
-        </tr>
-      </thead>
+  <tr>
+    <th style={{ textAlign: "left", padding: "12px" }}>
+      File
+    </th>
+
+    <th style={{ textAlign: "center", padding: "12px" }}>
+      Total
+    </th>
+
+    <th style={{ textAlign: "center", padding: "12px" }}>
+      Imported
+    </th>
+
+    <th style={{ textAlign: "center", padding: "12px" }}>
+      Duplicates
+    </th>
+
+    <th
+  style={{
+    textAlign: "left",
+    padding: "12px",
+    color: "#fff",
+    borderBottom:
+      "1px solid #333",
+  }}
+>
+      Date
+    </th>
+  </tr>
+</thead>
 
       <tbody>
         {importHistory.map(
           (item) => (
-            <tr
-              key={item.id}
-            >
-              <td>
-                {item.file_name}
-              </td>
+            <tr key={item.id}>
+  <td style={{ padding: "12px" }}>
+    {item.file_name}
+  </td>
 
-              <td>
-                {item.total_rows}
-              </td>
+  <td
+    style={{
+      textAlign: "center",
+      padding: "12px",
+    }}
+  >
+    {item.total_rows}
+  </td>
 
-              <td>
-                {item.imported_rows}
-              </td>
+  <td
+    style={{
+      textAlign: "center",
+      padding: "12px",
+      color: "#24a444",
+      fontWeight: 600,
+    }}
+  >
+    {item.imported_rows}
+  </td>
 
-              <td>
-                {
-                  item.duplicates_skipped
-                }
-              </td>
+  <td
+    style={{
+      textAlign: "center",
+      padding: "12px",
+      color: "#ff9800",
+      fontWeight: 600,
+    }}
+  >
+    {item.duplicates_skipped}
+  </td>
 
-              <td>
-                {new Date(
-                  item.uploaded_at
-                ).toLocaleString()}
-              </td>
-            </tr>
+  <td style={{ padding: "12px" }}>
+    {new Date(
+      item.uploaded_at
+    ).toLocaleString()}
+  </td>
+</tr>
           )
         )}
       </tbody>
@@ -690,6 +785,200 @@ async function loadImportHistory() {
   </div>
 )}
     </div>
+  </div>
+)}
+
+{inventoryReport.length > 0 && (
+  <div
+    style={{
+      marginTop: "30px",
+      padding: "20px",
+      border: "1px solid #333",
+      borderRadius: "12px",
+      background: "#111",
+    }}
+  >
+    <h3
+      style={{
+        marginBottom: "20px",
+        color: "#fff",
+      }}
+    >
+      Inventory Verification Report
+    </h3>
+
+<div
+  style={{
+    display: "flex",
+    gap: "10px",
+    marginBottom: "20px",
+  }}
+>
+  <input
+    type="text"
+    placeholder="Search Roll Number"
+    value={searchRoll}
+    onChange={(e) =>
+      setSearchRoll(e.target.value)
+    }
+    style={{
+      padding: "10px",
+      borderRadius: "8px",
+      border: "1px solid #333",
+      background: "#1b1b1b",
+      color: "#fff",
+    }}
+  />
+
+  <select
+    value={statusFilter}
+    onChange={(e) =>
+      setStatusFilter(e.target.value)
+    }
+    style={{
+      padding: "10px",
+      borderRadius: "8px",
+      border: "1px solid #333",
+      background: "#1b1b1b",
+      color: "#fff",
+    }}
+  >
+    <option value="all">
+      All
+    </option>
+
+    <option value="matched">
+      Matched
+    </option>
+
+    <option value="unmatched">
+      Unmatched
+    </option>
+  </select>
+</div>
+
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+      }}
+    >
+      <thead>
+        <tr>
+          <th
+            style={{
+              textAlign: "left",
+              padding: "12px",
+            }}
+          >
+            Customer
+          </th>
+
+          <th
+            style={{
+              textAlign: "left",
+              padding: "12px",
+            }}
+          >
+            Roll Number
+          </th>
+
+          <th
+            style={{
+              textAlign: "left",
+              padding: "12px",
+            }}
+          >
+            Product
+          </th>
+
+          <th
+            style={{
+              textAlign: "center",
+              padding: "12px",
+            }}
+          >
+            Status
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+  {inventoryReport
+    .filter((item) => {
+      const matchesStatus =
+        statusFilter === "all"
+          ? true
+          : item.inventory_status ===
+            statusFilter;
+
+      const matchesRoll =
+        searchRoll === ""
+          ? true
+          : item.roll_number
+              ?.toString()
+              .toLowerCase()
+              .includes(
+                searchRoll.toLowerCase()
+              );
+
+      return (
+        matchesStatus &&
+        matchesRoll
+      );
+    })
+    .map(
+      (item, index) => (
+            <tr key={index}>
+              <td
+  style={{
+    padding: "12px",
+    color: "#fff",
+  }}
+>
+                {item.customer_name}
+              </td>
+
+              <td
+  style={{
+    padding: "12px",
+    color: "#fff",
+  }}
+>
+                {item.roll_number}
+              </td>
+
+              <td
+  style={{
+    padding: "12px",
+    color: "#fff",
+  }}
+>
+                {item.product_name}
+              </td>
+
+              <td
+                style={{
+                  padding: "12px",
+                  textAlign: "center",
+                  color:
+                    item.inventory_status ===
+                    "matched"
+                      ? "#24a444"
+                      : "#ff4444",
+                  fontWeight: "bold",
+                }}
+              >
+                {item.inventory_status ===
+                "matched"
+                  ? "✅ Matched"
+                  : "❌ Unmatched"}
+              </td>
+            </tr>
+          )
+        )}
+      </tbody>
+    </table>
   </div>
 )}
       </div>
