@@ -21,6 +21,7 @@ const [stats, setStats] =
   useState({
     totalRolls: 0,
     importedFiles: 0,
+    matched: 0,
     unmatched: 0,
   });
 
@@ -53,6 +54,12 @@ const [searchRoll, setSearchRoll] =
 
 const [statusFilter, setStatusFilter] =
   useState("all");
+
+const [checkRoll, setCheckRoll] =
+  useState("");
+
+const [checkResult, setCheckResult] =
+  useState<any>(null);
 
   useEffect(() => {
   loadStats();
@@ -108,6 +115,18 @@ const unmatchedCount =
       "unmatched"
     );
 
+const matchedCount =
+  await supabase
+    .from("warranties")
+    .select("*", {
+      count: "exact",
+      head: true,
+    })
+    .eq(
+      "inventory_status",
+      "matched"
+    );
+
   setStats({
   totalRolls:
     count || 0,
@@ -115,8 +134,11 @@ const unmatchedCount =
   importedFiles:
     importHistoryCount.count || 0,
 
+  matched:
+    matchedCount.count || 0,
+
   unmatched:
-  unmatchedCount.count || 0,
+    unmatchedCount.count || 0,
 });
 }
 
@@ -363,6 +385,85 @@ async function loadInventoryReport() {
   );
 }
 
+async function exportUnmatchedReport() {
+  const unmatchedRows =
+    inventoryReport.filter(
+      (item) =>
+        item.inventory_status ===
+        "unmatched"
+    );
+
+  if (
+    unmatchedRows.length === 0
+  ) {
+    alert(
+      "No unmatched warranties found"
+    );
+    return;
+  }
+
+  const exportRows =
+  unmatchedRows.map(
+    (item) => ({
+      Customer:
+        item.customer_name,
+
+      Roll_Number:
+        item.roll_number,
+
+      Product:
+        item.product_name,
+
+      Status:
+        item.inventory_status,
+    })
+  );
+
+const worksheet =
+  XLSX.utils.json_to_sheet(
+    exportRows
+  );
+  const workbook =
+    XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Unmatched Warranties"
+  );
+
+  XLSX.writeFile(
+    workbook,
+    `Unmatched_Warranties_${new Date()
+      .toISOString()
+      .split("T")[0]}.xlsx`
+  );
+}
+
+async function verifyRoll() {
+  if (!checkRoll) return;
+
+  const { data } =
+    await supabase
+      .from("roll_inventory")
+      .select("*")
+      .eq(
+        "roll_number",
+        checkRoll
+      )
+      .maybeSingle();
+
+  if (!data) {
+    setCheckResult({
+      notFound: true,
+    });
+
+    return;
+  }
+
+  setCheckResult(data);
+}
+
   return (
     <div
       style={{
@@ -540,6 +641,127 @@ async function loadInventoryReport() {
     {stats.unmatched}
   </h1>
 </div>
+</div>
+
+<div
+  style={{
+    background: "#1b1b1b",
+    border: "1px solid #333",
+    borderRadius: "16px",
+    padding: "20px",
+    minWidth: "220px",
+  }}
+>
+  <h3
+    style={{
+      color: "#999",
+      marginBottom: "10px",
+    }}
+  >
+    Matched Warranties
+  </h3>
+
+  <h1
+    style={{
+      color: "#24a444",
+    }}
+  >
+    {stats.matched}
+  </h1>
+</div>
+
+<div
+  style={{
+    background: "#1b1b1b",
+    border: "1px solid #333",
+    borderRadius: "16px",
+    padding: "20px",
+    marginTop: "24px",
+  }}
+>
+  <h2
+    style={{
+      color: "#fff",
+      marginBottom: "16px",
+    }}
+  >
+    Quick Roll Check
+  </h2>
+
+  <div
+    style={{
+      display: "flex",
+      gap: "10px",
+    }}
+  >
+    <input
+      type="text"
+      placeholder="Enter Roll Number"
+      value={checkRoll}
+      onChange={(e) =>
+        setCheckRoll(
+          e.target.value
+        )
+      }
+      style={{
+        flex: 1,
+        padding: "12px",
+        background: "#222",
+        color: "#fff",
+        border: "1px solid #444",
+        borderRadius: "10px",
+      }}
+    />
+
+    <button
+      onClick={verifyRoll}
+      style={{
+        background: "#24a444",
+        color: "#fff",
+        border: "none",
+        borderRadius: "10px",
+        padding: "12px 20px",
+        cursor: "pointer",
+      }}
+    >
+      Verify Roll
+    </button>
+  </div>
+
+  {checkResult?.notFound ? (
+  <div
+    style={{
+      marginTop: "16px",
+      color: "#ff4444",
+      fontWeight: "bold",
+    }}
+  >
+    ❌ Roll Not Found
+  </div>
+) : checkResult ? (
+
+    <div
+      style={{
+        marginTop: "16px",
+        color: "#24a444",
+      }}
+    >
+      ✅ Found In Inventory
+
+      <br />
+
+      Product:
+      {" "}
+      {checkResult.product_name}
+
+      <br />
+
+      Sheet:
+      {" "}
+      {checkResult.sheet_name}
+    </div>
+) : null}
+  
 </div>
 
 <div
@@ -798,14 +1020,38 @@ async function loadInventoryReport() {
       background: "#111",
     }}
   >
-    <h3
-      style={{
-        marginBottom: "20px",
-        color: "#fff",
-      }}
-    >
-      Inventory Verification Report
-    </h3>
+    <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "20px",
+  }}
+>
+  <h3
+    style={{
+      color: "#fff",
+      margin: 0,
+    }}
+  >
+    Inventory Verification Report
+  </h3>
+
+  <button
+    onClick={exportUnmatchedReport}
+    style={{
+      background: "#ff9800",
+      color: "#fff",
+      border: "none",
+      borderRadius: "10px",
+      padding: "10px 16px",
+      cursor: "pointer",
+      fontWeight: "bold",
+    }}
+  >
+    Export Unmatched Report
+  </button>
+</div>
 
 <div
   style={{
