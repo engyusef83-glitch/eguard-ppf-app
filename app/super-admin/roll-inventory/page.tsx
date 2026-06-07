@@ -61,6 +61,9 @@ const [checkRoll, setCheckRoll] =
 const [checkResult, setCheckResult] =
   useState<any>(null);
 
+const [rechecking, setRechecking] =
+  useState(false);
+
   useEffect(() => {
   loadStats();
   loadSettings();
@@ -462,6 +465,80 @@ async function verifyRoll() {
   }
 
   setCheckResult(data);
+}
+
+async function recheckAllWarranties() {
+  setRechecking(true);
+
+  try {
+    const { data: warranties } =
+      await supabase
+        .from("warranties")
+        .select(
+          "id, roll_number"
+        );
+
+const { data: inventory } =
+  await supabase
+    .from("roll_inventory")
+    .select("roll_number");
+
+const inventorySet =
+  new Set(
+    inventory?.map(
+      (item) =>
+        item.roll_number
+    ) || []
+  );
+
+
+    if (!warranties) {
+      setRechecking(false);
+      return;
+    }
+
+    for (const warranty of warranties) {
+      const matched =
+  inventorySet.has(
+    warranty.roll_number
+  );
+
+      await supabase
+        .from("warranties")
+        .update({
+          inventory_match:
+            matched,
+
+          inventory_status:
+            matched
+              ? "matched"
+              : "unmatched",
+
+          inventory_checked_at:
+            new Date()
+              .toISOString(),
+        })
+        .eq(
+          "id",
+          warranty.id
+        );
+    }
+
+    alert(
+      "Warranty recheck completed"
+    );
+
+    await loadStats();
+    await loadInventoryReport();
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      "Recheck failed"
+    );
+  }
+
+  setRechecking(false);
 }
 
   return (
@@ -1052,6 +1129,27 @@ async function verifyRoll() {
     Export Unmatched Report
   </button>
 </div>
+
+<button
+  onClick={
+    recheckAllWarranties
+  }
+  disabled={rechecking}
+  style={{
+    background: "#2196f3",
+    color: "#fff",
+    border: "none",
+    borderRadius: "10px",
+    padding: "10px 16px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    marginLeft: "10px",
+  }}
+>
+  {rechecking
+    ? "Rechecking..."
+    : "Recheck All"}
+</button>
 
 <div
   style={{
