@@ -1117,8 +1117,9 @@ const pdfBlob = doc.output("blob");
         style={{
           display: "grid",
           gridTemplateColumns:
-            "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "12px",
+  "repeat(auto-fit, minmax(220px, 1fr))",
+
+gap: "12px",
           marginBottom: "20px",
         }}
       >
@@ -1649,14 +1650,28 @@ const pdfBlob = doc.output("blob");
             >
               <div>
                 <p style={{color:"#888",fontSize:"12px"}}>VIN</p>
-                <p style={{color:"#fff"}}>{item.vin}</p>
+                <p
+  style={{
+    color:"#fff",
+    wordBreak:"break-all",
+    overflowWrap:"break-word"
+  }}
+>
+  {item.vin}
+</p>
               </div>
 
               <div>
                 <p style={{color:"#888",fontSize:"12px"}}>Roll</p>
-                <p style={{color:"#fff"}}>
-                  {item.roll_number}
-                </p>
+                <p
+  style={{
+    color:"#fff",
+    wordBreak:"break-all",
+    overflowWrap:"break-word"
+  }}
+>
+  {item.roll_number}
+</p>
               </div>
 
               <div>
