@@ -269,6 +269,44 @@ const { data: inventoryRoll } =
 const inventoryMatch =
   !!inventoryRoll;
 
+const { data: settings } =
+  await supabase
+    .from("system_settings")
+    .select(
+      "roll_verification_mode"
+    )
+    .eq("id", 1)
+    .single();
+
+const verificationMode =
+  settings?.roll_verification_mode ||
+  "disabled";
+
+if (
+  verificationMode === "strict" &&
+  !inventoryMatch
+) {
+  alert(
+    "❌ Roll Number not found in Inventory.\n\nWarranty creation blocked by Strict Mode."
+  );
+
+  return;
+}
+
+if (
+  verificationMode === "warning" &&
+  !inventoryMatch
+) {
+  const proceed =
+    confirm(
+      "⚠️ Roll Number not found in Inventory.\n\nDo you want to continue creating the warranty?"
+    );
+
+  if (!proceed) {
+    return;
+  }
+}
+
     const { error } =
       await supabase
         .from("warranties")
@@ -327,7 +365,23 @@ status:
       return;
     }
 
+await supabase
+  .from("admin_notifications")
+  .insert([
+    {
+      title:
+        "New Warranty Created",
 
+      message:
+        `Customer: ${customerName}
+Center: ${centerName}
+Product: ${product.name}
+Roll: ${rollNumber}`,
+
+      type:
+        "warranty",
+    },
+  ]);
 
 alert(
 `✅ Warranty Added Successfully

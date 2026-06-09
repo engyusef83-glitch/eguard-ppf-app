@@ -148,10 +148,7 @@ const matchedCount =
 async function updateMode(
   value: string
 ) {
-  console.log(
-    "NEW MODE:",
-    value
-  );
+  const oldMode = mode;
 
   setMode(value);
 
@@ -164,10 +161,34 @@ async function updateMode(
       })
       .eq("id", 1);
 
-  console.log(
-    "UPDATE ERROR:",
-    error
-  );
+  if (error) {
+    console.error(error);
+
+    alert(
+      "Failed to update mode"
+    );
+
+    setMode(oldMode);
+
+    return;
+  }
+
+  await supabase
+    .from("admin_notifications")
+    .insert([
+      {
+        title:
+          "⚙️ Verification Mode Changed",
+
+        message:
+          `Old Mode: ${oldMode}
+
+New Mode: ${value}`,
+
+        type:
+          "settings",
+      },
+    ]);
 }
 
 
@@ -265,6 +286,21 @@ async function confirmImport() {
       })
     );
 
+const unmatchedBeforeResult =
+  await supabase
+    .from("warranties")
+    .select("*", {
+      count: "exact",
+      head: true,
+    })
+    .eq(
+      "inventory_status",
+      "unmatched"
+    );
+
+const unmatchedBefore =
+  unmatchedBeforeResult.count || 0;
+
   const beforeResult =
     await supabase
       .from("roll_inventory")
@@ -316,7 +352,33 @@ async function confirmImport() {
     rowsToInsert.length -
     importedRows;
 
+  
+
+await recheckAllWarranties();
+
+const unmatchedAfterResult =
   await supabase
+    .from("warranties")
+    .select("*", {
+      count: "exact",
+      head: true,
+    })
+    .eq(
+      "inventory_status",
+      "unmatched"
+    );
+
+const unmatchedAfter =
+  unmatchedAfterResult.count || 0;
+
+const autoFixedMatches =
+  Math.max(
+    unmatchedBefore -
+      unmatchedAfter,
+    0
+  );
+
+await supabase
     .from("roll_import_history")
     .insert({
       file_name:
@@ -334,8 +396,53 @@ async function confirmImport() {
       duplicates_skipped:
         duplicatesSkipped,
 
-      auto_fixed_matches: 0,
+      auto_fixed_matches:
+       autoFixedMatches,
     });
+
+await loadInventoryReport();
+
+await supabase
+  .from("admin_notifications")
+  .insert([
+    {
+      title:
+        "📦 Inventory Imported",
+
+      message:
+        `File: ${selectedFile?.name || "Unknown"}
+
+Imported: ${importedRows}
+
+Duplicates: ${duplicatesSkipped}
+
+Auto Fixed: ${autoFixedMatches || 0}`,
+
+      type:
+        "inventory_import",
+    },
+  ]);
+
+if (
+  autoFixedMatches > 0
+) {
+  await supabase
+    .from(
+      "admin_notifications"
+    )
+    .insert([
+      {
+        title:
+          "🔄 Warranties Auto Fixed",
+
+        message:
+          `${autoFixedMatches} unmatched warranties were automatically matched after inventory import.`,
+
+        type:
+          "auto_fix",
+      },
+    ]);
+}
 
   alert(
     `Import Completed
@@ -487,10 +594,11 @@ const inventorySet =
   new Set(
     inventory?.map(
       (item) =>
-        item.roll_number
+        String(
+          item.roll_number
+        ).trim()
     ) || []
   );
-
 
     if (!warranties) {
       setRechecking(false);
@@ -498,10 +606,14 @@ const inventorySet =
     }
 
     for (const warranty of warranties) {
-      const matched =
+    const matched =
   inventorySet.has(
-    warranty.roll_number
+    String(
+      warranty.roll_number
+    ).trim()
   );
+
+
 
       await supabase
         .from("warranties")
@@ -524,10 +636,7 @@ const inventorySet =
         );
     }
 
-    alert(
-      "Warranty recheck completed"
-    );
-
+   
     await loadStats();
     await loadInventoryReport();
   } catch (error) {
@@ -635,6 +744,7 @@ const inventorySet =
   style={{
     marginTop: "20px",
     display: "flex",
+flexWrap: "wrap",
     gap: "20px",
   }}
 >
@@ -718,7 +828,6 @@ const inventorySet =
     {stats.unmatched}
   </h1>
 </div>
-</div>
 
 <div
   style={{
@@ -746,6 +855,9 @@ const inventorySet =
     {stats.matched}
   </h1>
 </div>
+</div>
+
+
 
 <div
   style={{
@@ -982,7 +1094,7 @@ const inventorySet =
       marginTop: "30px",
       padding: "20px",
       border: "1px solid #333",
-      borderRadius: "12px",
+      borderRadius: "16px",
       background: "#111",
     }}
   >
@@ -1017,6 +1129,15 @@ const inventorySet =
     <th style={{ textAlign: "center", padding: "12px" }}>
       Duplicates
     </th>
+
+<th
+  style={{
+    textAlign: "center",
+    padding: "12px",
+  }}
+>
+  Auto Fixed
+</th>
 
     <th
   style={{
@@ -1071,6 +1192,17 @@ const inventorySet =
     {item.duplicates_skipped}
   </td>
 
+<td
+  style={{
+    textAlign: "center",
+    padding: "12px",
+    color: "#24a444",
+    fontWeight: 600,
+  }}
+>
+  {item.auto_fixed_matches || 0}
+</td>
+
   <td style={{ padding: "12px" }}>
     {new Date(
       item.uploaded_at
@@ -1093,7 +1225,7 @@ const inventorySet =
       marginTop: "30px",
       padding: "20px",
       border: "1px solid #333",
-      borderRadius: "12px",
+      borderRadius: "16px",
       background: "#111",
     }}
   >
@@ -1105,15 +1237,42 @@ const inventorySet =
     marginBottom: "20px",
   }}
 >
-  <h3
-    style={{
-      color: "#fff",
-      margin: 0,
-    }}
-  >
-    Inventory Verification Report
-  </h3>
+  <h2
+  style={{
+    color: "#fff",
+    margin: 0,
+    fontSize: "22px",
+    fontWeight: 700,
+  }}
+>
+  Inventory Verification Report
+</h2>
 
+<div
+  style={{
+    display: "flex",
+    gap: "10px",
+  }}
+>
+
+<button
+  onClick={recheckAllWarranties}
+  disabled={rechecking}
+  style={{
+    background: "#2196f3",
+    color: "#fff",
+    border: "none",
+    borderRadius: "10px",
+    padding: "10px 16px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  }}
+>
+  {rechecking
+    ? "Rechecking..."
+    : "Recheck All"}
+
+</button>
   <button
     onClick={exportUnmatchedReport}
     style={{
@@ -1129,33 +1288,17 @@ const inventorySet =
     Export Unmatched Report
   </button>
 </div>
+</div>
 
-<button
-  onClick={
-    recheckAllWarranties
-  }
-  disabled={rechecking}
-  style={{
-    background: "#2196f3",
-    color: "#fff",
-    border: "none",
-    borderRadius: "10px",
-    padding: "10px 16px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    marginLeft: "10px",
-  }}
->
-  {rechecking
-    ? "Rechecking..."
-    : "Recheck All"}
-</button>
+
 
 <div
   style={{
     display: "flex",
     gap: "10px",
     marginBottom: "20px",
+    marginTop: "20px",
+    alignItems: "center",
   }}
 >
   <input
@@ -1166,6 +1309,7 @@ const inventorySet =
       setSearchRoll(e.target.value)
     }
     style={{
+flex: 1,
       padding: "10px",
       borderRadius: "8px",
       border: "1px solid #333",
@@ -1180,12 +1324,13 @@ const inventorySet =
       setStatusFilter(e.target.value)
     }
     style={{
-      padding: "10px",
-      borderRadius: "8px",
-      border: "1px solid #333",
-      background: "#1b1b1b",
-      color: "#fff",
-    }}
+  minWidth: "180px",
+  padding: "10px 14px",
+  borderRadius: "8px",
+  border: "1px solid #333",
+  background: "#1b1b1b",
+  color: "#fff",
+}}
   >
     <option value="all">
       All

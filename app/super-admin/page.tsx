@@ -85,6 +85,22 @@ const [products, setProducts] =
   useState<any[]>([]);
 
 const [
+  notifications,
+  setNotifications,
+] = useState<any[]>([]);
+
+const [
+  showNotifications,
+  setShowNotifications,
+] = useState(false);
+
+const unreadCount =
+  notifications.filter(
+    (n) => !n.is_read
+  ).length;
+
+
+const [
   showAddProduct,
   setShowAddProduct,
 ] = useState(false);
@@ -218,6 +234,26 @@ const {
 
 setProducts(
   productsData ||
+    []
+);
+
+const {
+  data: notificationsData,
+} = await supabase
+  .from(
+    "admin_notifications"
+  )
+  .select("*")
+  .order(
+    "created_at",
+    {
+      ascending: false,
+    }
+  )
+  .limit(20);
+
+setNotifications(
+  notificationsData ||
     []
 );
 
@@ -510,6 +546,151 @@ async function exportWarranties() {
             logout
           }
         />
+
+<div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: "20px",
+  }}
+>
+  <button
+    onClick={() =>
+      setShowNotifications(
+        !showNotifications
+      )
+    }
+    style={{
+      background: "#1e88e5",
+      color: "#fff",
+      border: "none",
+      borderRadius: "12px",
+      padding: "12px 18px",
+      cursor: "pointer",
+      fontWeight: "bold",
+    }}
+  >
+
+{showNotifications && (
+  <div
+    style={{
+      background: "#1b1b1b",
+      border: "1px solid #333",
+      borderRadius: "12px",
+      padding: "16px",
+      marginBottom: "20px",
+      maxHeight: "400px",
+      overflowY: "auto",
+    }}
+  >
+
+<div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: "12px",
+  }}
+>
+  <button
+    onClick={async () => {
+
+      await supabase
+        .from(
+          "admin_notifications"
+        )
+        .update({
+          is_read: true,
+        })
+        .eq(
+          "is_read",
+          false
+        );
+
+      await loadData();
+    }}
+    style={{
+      background: "#24a444",
+      color: "#fff",
+      border: "none",
+      borderRadius: "8px",
+      padding: "8px 12px",
+      cursor: "pointer",
+    }}
+  >
+    ✓ Mark All as Read
+  </button>
+</div>
+
+    {notifications.length === 0 ? (
+      <div
+        style={{
+          color: "#888",
+        }}
+      >
+        No notifications
+      </div>
+    ) : (
+      notifications.map(
+        (notification) => (
+          <div
+            key={
+              notification.id
+            }
+            style={{
+              borderBottom:
+                "1px solid #333",
+              padding:
+                "12px 0",
+            }}
+          >
+            <div
+              style={{
+                color: "#fff",
+                fontWeight: "bold",
+                marginBottom:
+                  "6px",
+              }}
+            >
+              {
+                notification.title
+              }
+            </div>
+
+            <div
+              style={{
+                color: "#ccc",
+                whiteSpace:
+                  "pre-line",
+              }}
+            >
+              {
+                notification.message
+              }
+            </div>
+
+            <div
+              style={{
+                color: "#777",
+                fontSize:
+                  "12px",
+                marginTop:
+                  "6px",
+              }}
+            >
+              {new Date(
+                notification.created_at
+              ).toLocaleString()}
+            </div>
+          </div>
+        )
+      )
+    )}
+  </div>
+)}
+    🔔 Notifications (
+     {unreadCount})
+  </button>
+</div>
 
         <StatsCards
           stats={stats}
