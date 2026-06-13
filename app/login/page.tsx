@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -124,20 +128,49 @@ router.push("/admin");
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "#f5f5f5",
+        background: "#0f0f0f",
       }}
     >
       <div
         style={{
-          background: "white",
-          padding: "40px",
-          borderRadius: "12px",
-          width: "400px",
-          boxShadow: "0 0 20px rgba(0,0,0,0.1)",
+background: "#181818",
+padding: "50px",
+borderRadius: "24px",
+border: "1px solid #2b2b2b",
+boxShadow:
+  "0 20px 60px rgba(0,0,0,0.5)",
         }}
       >
-        <h1 style={{ marginBottom: "20px" }}>Admin Login</h1>
+       <div
+  style={{
+    textAlign: "center",
+    marginBottom: "20px",
+  }}
+>
+ 
 
+  <h1
+  style={{
+    color: "#fff",
+    fontSize: "32px",
+    fontWeight: "700",
+    marginTop: "20px",
+    marginBottom: "10px",
+  }}
+>
+  EGUARD Warranty System
+</h1>
+
+  <p
+style={{
+  color: "#888",
+  fontSize: "15px",
+  lineHeight: "24px",
+}}
+  >
+    Professional Warranty & Inventory Management Platform
+  </p>
+</div>
         <input
           type="email"
           placeholder="Email"
@@ -147,7 +180,11 @@ router.push("/admin");
             width: "100%",
             padding: "14px",
             marginBottom: "15px",
-            border: "1px solid #ccc",
+            background: "#101010",
+border: "1px solid #333",
+borderRadius: "12px",
+color: "#fff",
+fontSize: "16px",
           }}
         />
 
@@ -170,7 +207,10 @@ router.push("/admin");
           style={{
             width: "100%",
             padding: "14px",
-            background: "black",
+            background: "#24a444",
+borderRadius: "12px",
+fontWeight: "bold",
+fontSize: "16px",
             color: "white",
             border: "none",
             cursor: "pointer",
@@ -178,6 +218,17 @@ router.push("/admin");
         >
           {loading ? "Loading..." : "Login"}
         </button>
+
+<div
+  style={{
+    textAlign: "center",
+    marginTop: "25px",
+    color: "#666",
+    fontSize: "13px",
+  }}
+>
+  © 2026 EGUARD. All rights reserved.
+</div>
 
         {message && (
           <p style={{ color: "red", marginTop: "15px" }}>

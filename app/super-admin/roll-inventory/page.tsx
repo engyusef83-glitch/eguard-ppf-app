@@ -23,6 +23,10 @@ const [stats, setStats] =
     importedFiles: 0,
     matched: 0,
     unmatched: 0,
+
+    availableRolls: 0,
+    usedRolls: 0,
+    releasedRolls: 0,
   });
 
 const [selectedFile, setSelectedFile] =
@@ -130,7 +134,43 @@ const matchedCount =
       "matched"
     );
 
-  setStats({
+const availableCount =
+  await supabase
+    .from("roll_inventory")
+    .select("*", {
+      count: "exact",
+      head: true,
+    })
+    .eq(
+      "roll_status",
+      "Available"
+    );
+
+const usedCount =
+  await supabase
+    .from("roll_inventory")
+    .select("*", {
+      count: "exact",
+      head: true,
+    })
+    .eq(
+      "roll_status",
+      "Used"
+    );
+
+const releasedCount =
+  await supabase
+    .from("roll_inventory")
+    .select("*", {
+      count: "exact",
+      head: true,
+    })
+    .eq(
+      "roll_status",
+      "Released"
+    );
+
+setStats({
   totalRolls:
     count || 0,
 
@@ -142,6 +182,15 @@ const matchedCount =
 
   unmatched:
     unmatchedCount.count || 0,
+
+  availableRolls:
+    availableCount.count || 0,
+
+  usedRolls:
+    usedCount.count || 0,
+
+  releasedRolls:
+    releasedCount.count || 0,
 });
 }
 
@@ -477,14 +526,15 @@ async function loadInventoryReport() {
   const { data } =
     await supabase
       .from("warranties")
-      .select(
-        `
-        customer_name,
-        roll_number,
-        product_name,
-        inventory_status
-      `
-      )
+.select(
+  `
+  customer_name,
+  roll_number,
+  product_name,
+  inventory_status,
+  roll_status
+`
+)
       .order("id", {
         ascending: false,
       })
@@ -802,6 +852,35 @@ flexWrap: "wrap",
   </h1>
 </div>
 
+
+<div
+  style={{
+    background: "#1b1b1b",
+    border: "1px solid #333",
+    borderRadius: "16px",
+    padding: "20px",
+    minWidth: "220px",
+  }}
+>
+  <h3
+    style={{
+      color: "#999",
+      marginBottom: "10px",
+    }}
+  >
+    Matched Warranties
+  </h3>
+
+  <h1
+    style={{
+      color: "#24a444",
+    }}
+  >
+    {stats.matched}
+  </h1>
+
+</div>
+
 <div
   style={{
     background: "#1b1b1b",
@@ -829,6 +908,7 @@ flexWrap: "wrap",
   </h1>
 </div>
 
+
 <div
   style={{
     background: "#1b1b1b",
@@ -844,7 +924,7 @@ flexWrap: "wrap",
       marginBottom: "10px",
     }}
   >
-    Matched Warranties
+    Available Rolls
   </h3>
 
   <h1
@@ -852,10 +932,69 @@ flexWrap: "wrap",
       color: "#24a444",
     }}
   >
-    {stats.matched}
+    {stats.availableRolls}
   </h1>
 </div>
+
+<div
+  style={{
+    background: "#1b1b1b",
+    border: "1px solid #333",
+    borderRadius: "16px",
+    padding: "20px",
+    minWidth: "220px",
+  }}
+>
+  <h3
+    style={{
+      color: "#999",
+      marginBottom: "10px",
+    }}
+  >
+    Used Rolls
+  </h3>
+
+  <h1
+    style={{
+      color: "#ff9800",
+    }}
+  >
+    {stats.usedRolls}
+  </h1>
 </div>
+
+<div
+  style={{
+    background: "#1b1b1b",
+    border: "1px solid #333",
+    borderRadius: "16px",
+    padding: "20px",
+    minWidth: "220px",
+  }}
+>
+  <h3
+    style={{
+      color: "#999",
+      marginBottom: "10px",
+    }}
+  >
+    Released Rolls
+  </h3>
+
+  <h1
+    style={{
+      color: "#2196f3",
+    }}
+  >
+    {stats.releasedRolls}
+  </h1>
+</div>
+
+
+
+ 
+</div>
+
 
 
 
@@ -1373,22 +1512,31 @@ flex: 1,
           </th>
 
           <th
-            style={{
-              textAlign: "left",
-              padding: "12px",
-            }}
-          >
-            Product
-          </th>
+  style={{
+    textAlign: "left",
+    padding: "12px",
+  }}
+>
+  Product
+</th>
 
-          <th
-            style={{
-              textAlign: "center",
-              padding: "12px",
-            }}
-          >
-            Status
-          </th>
+<th
+  style={{
+    textAlign: "center",
+    padding: "12px",
+  }}
+>
+  Roll Status
+</th>
+
+<th
+  style={{
+    textAlign: "center",
+    padding: "12px",
+  }}
+>
+  Status
+</th>
         </tr>
       </thead>
 
@@ -1445,6 +1593,22 @@ flex: 1,
 >
                 {item.product_name}
               </td>
+
+<td
+  style={{
+    padding: "12px",
+    textAlign: "center",
+    fontWeight: "bold",
+    color:
+      item.roll_status === "Used"
+        ? "#ff9800"
+        : item.roll_status === "Released"
+        ? "#2196f3"
+        : "#24a444",
+  }}
+>
+  {item.roll_status || "Available"}
+</td>
 
               <td
                 style={{

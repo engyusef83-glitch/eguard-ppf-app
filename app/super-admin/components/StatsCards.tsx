@@ -6,7 +6,9 @@ type Props = {
     centers: number;
     warranties: number;
     active: number;
+    expiringSoon: number;
     expired: number;
+    cancelled: number;
   };
 };
 
@@ -26,32 +28,52 @@ export default function StatsCards({
           "30px",
       }}
     >
-      {[
-        {
-          title:
-            "Total Centers",
-          value:
-            stats.centers,
-        },
-        {
-          title:
-            "Total Warranties",
-          value:
-            stats.warranties,
-        },
-        {
-          title:
-            "Active Warranties",
-          value:
-            stats.active,
-        },
-        {
-          title:
-            "Expired Warranties",
-          value:
-            stats.expired,
-        },
-      ].map(
+      {
+[
+  {
+    title:
+      "Total Centers",
+    value:
+      stats.centers,
+  },
+
+  {
+    title:
+      "Total Warranties",
+    value:
+      stats.warranties,
+  },
+
+  {
+    title:
+      "Active Warranties",
+    value:
+      stats.active,
+  },
+
+  {
+    title:
+      "Expiring Soon",
+    value:
+      stats.expiringSoon,
+  },
+
+  {
+    title:
+      "Expired Warranties",
+    value:
+      stats.expired,
+  },
+
+  {
+    title:
+      "Cancelled Warranties",
+    value:
+      stats.cancelled,
+  },
+]
+
+.map(
         (
           card
         ) => (
@@ -81,14 +103,24 @@ export default function StatsCards({
               }
             </p>
 
-            <h2
-              style={{
-                color:
-                  "#fff",
-                fontSize:
-                  "36px",
-              }}
-            >
+<h2
+  style={{
+    color:
+      card.title ===
+      "Active Warranties"
+        ? "#24a444"
+        : card.title ===
+          "Expiring Soon"
+        ? "#ff9800"
+        : card.title ===
+          "Cancelled Warranties"
+        ? "#ff4444"
+        : "#fff",
+
+    fontSize:
+      "36px",
+  }}
+>
               {
                 card.value
               }

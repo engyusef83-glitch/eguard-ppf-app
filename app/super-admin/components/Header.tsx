@@ -22,24 +22,24 @@ export default function Header({
     >
       <div>
         <h1
-          style={{
-            color:
-              "#fff",
-            marginBottom:
-              "8px",
-          }}
-        >
-          EGUARD MASTER PANEL
-        </h1>
+  style={{
+    color: "#fff",
+    margin: 0,
+    fontSize: "32px",
+    fontWeight: "bold",
+  }}
+>
+  EGUARD Warranty System
+</h1>
 
-        <p
-          style={{
-            color:
-              "#888",
-          }}
-        >
-          Super Admin Dashboard
-        </p>
+<p
+  style={{
+    color: "#888",
+    marginTop: "8px",
+  }}
+>
+  Super Admin Control Center
+</p>
       </div>
 
       <button

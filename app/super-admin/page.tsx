@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import Header from "./components/Header";
 import StatsCards from "./components/StatsCards";
@@ -16,11 +17,6 @@ import ProductsTable from "./components/ProductsTable";
 import AddProductModal from "./components/AddProductModal";
 import EditProductModal from "./components/EditProductModal";
 import DeleteProductModal from "./components/DeleteProductModal";
-
-
-
-
-
 
 
 
@@ -50,10 +46,12 @@ const [selectedCenter, setSelectedCenter] =
 
   const [stats, setStats] =
     useState({
-      centers: 0,
-      warranties: 0,
-      active: 0,
-      expired: 0,
+  centers: 0,
+  warranties: 0,
+  active: 0,
+  expiringSoon: 0,
+  expired: 0,
+  cancelled: 0,
     });
 
 const [
@@ -206,6 +204,8 @@ const [
       .from("warranties")
       .select("*");
 
+
+
     const {
       data:
         centersData,
@@ -258,30 +258,80 @@ setNotifications(
 );
 
 
-    const active =
-      warranties?.filter(
-        (w) =>
-          w.status ===
-          "Active"
-      ).length || 0;
+const today =
+  new Date()
+    .toISOString()
+    .split("T")[0];
 
-    const expired =
-      warranties?.filter(
-        (w) =>
-          w.status !==
-          "Active"
-      ).length || 0;
+const active =
+  warranties?.filter(
+    (w) =>
+      w.status !==
+        "Cancelled" &&
+      w.end_date >=
+        today
+  ).length || 0;
 
-    setStats({
-      centers:
-        centerCount ||
-        0,
-      warranties:
-        warranties?.length ||
-        0,
-      active,
-      expired,
-    });
+const expired =
+  warranties?.filter(
+    (w) =>
+      w.status !==
+        "Cancelled" &&
+      w.end_date <
+        today
+  ).length || 0;
+
+const expiringSoon =
+  warranties?.filter((w) => {
+
+    if (
+      w.status ===
+      "Cancelled"
+    ) {
+      return false;
+    }
+
+    const days =
+      Math.ceil(
+        (
+          new Date(
+            w.end_date
+          ).getTime() -
+          new Date(
+            today
+          ).getTime()
+        ) /
+          (
+            1000 *
+            60 *
+            60 *
+            24
+          )
+      );
+
+    return (
+      days >= 0 &&
+      days <= 30
+    );
+  }).length || 0;
+
+const cancelled =
+  warranties?.filter(
+    (w) =>
+      w.status ===
+      "Cancelled"
+  ).length || 0;
+
+setStats({
+  centers:
+    centerCount || 0,
+  warranties:
+    warranties?.length || 0,
+  active,
+  expiringSoon,
+  expired,
+  cancelled,
+});
   }
 
 const filteredCenters =
@@ -550,8 +600,19 @@ async function exportWarranties() {
 <div
   style={{
     display: "flex",
-    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: "16px",
+    marginBottom: "24px",
+  }}
+>
+  
+ 
+</div>
+
+<div
+  style={{
     marginBottom: "20px",
+    textAlign: "right",
   }}
 >
   <button
@@ -571,18 +632,27 @@ async function exportWarranties() {
     }}
   >
 
+
+    🔔 Notifications (
+     {unreadCount})
+  </button>
+
 {showNotifications && (
-  <div
-    style={{
-      background: "#1b1b1b",
-      border: "1px solid #333",
-      borderRadius: "12px",
-      padding: "16px",
-      marginBottom: "20px",
-      maxHeight: "400px",
-      overflowY: "auto",
-    }}
-  >
+<div
+  style={{
+    background: "#1b1b1b",
+    border: "1px solid #333",
+    borderRadius: "12px",
+    padding: "16px",
+    marginTop: "12px",
+    marginLeft: "auto",
+    width: "250px",
+    maxWidth: "100%",
+    maxHeight: "400px",
+    overflowY: "auto",
+    
+  }}
+>
 
 <div
   style={{
@@ -687,9 +757,7 @@ async function exportWarranties() {
     )}
   </div>
 )}
-    🔔 Notifications (
-     {unreadCount})
-  </button>
+
 </div>
 
         <StatsCards
@@ -699,12 +767,9 @@ async function exportWarranties() {
 
 <div
   style={{
-    display:
-      "flex",
-    justifyContent:
-      "flex-end",
-    marginBottom:
-      "20px",
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: "20px",
   }}
 >
   <button
@@ -783,6 +848,25 @@ async function exportWarranties() {
   }}
 >
   Roll Inventory
+</button>
+
+<button
+  onClick={() =>
+    window.location.href =
+      "/super-admin/warranty-management"
+  }
+  style={{
+    background: "#673ab7",
+    color: "#fff",
+    border: "none",
+    borderRadius: "12px",
+    padding: "14px 18px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    marginLeft: "12px",
+  }}
+>
+  Warranty Management
 </button>
 
 

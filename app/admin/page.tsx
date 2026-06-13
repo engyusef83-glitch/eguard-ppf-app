@@ -5,6 +5,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
+import * as XLSX from "xlsx";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -90,6 +91,11 @@ export default function AdminPage() {
     useState("");
 const [products, setProducts] =
   useState<any[]>([]);
+
+const [
+  statusFilter,
+  setStatusFilter
+] = useState("all");
 
 
   const t =
@@ -307,6 +313,56 @@ if (
   }
 }
 
+const { data: existingRoll } =
+  await supabase
+    .from("roll_inventory")
+    .select(
+      "roll_status"
+    )
+    .eq(
+      "roll_number",
+      rollNumber
+    )
+    .maybeSingle();
+
+if (
+  existingRoll?.roll_status ===
+  "Used"
+) {
+
+  alert(
+    "❌ This roll is already used."
+  );
+
+  return;
+}
+
+const { data: activeWarranty } =
+  await supabase
+    .from("warranties")
+    .select("id")
+    .eq(
+      "roll_number",
+      rollNumber
+    )
+    .eq(
+      "status",
+      "Active"
+    )
+    .limit(1);
+
+if (
+  activeWarranty &&
+  activeWarranty.length > 0
+) {
+
+  alert(
+    "❌ This roll number is already used in another active warranty."
+  );
+
+  return;
+}
+
     const { error } =
       await supabase
         .from("warranties")
@@ -356,9 +412,25 @@ inventory_checked_at:
 
 status:
   "Active",
+roll_status:
+  "Used",
 
           },
         ]);
+
+if (!error) {
+
+  await supabase
+    .from("roll_inventory")
+    .update({
+      roll_status: "Used",
+    })
+    .eq(
+      "roll_number",
+      rollNumber
+    );
+
+}
 
     if (error) {
       alert(error.message);
@@ -399,16 +471,225 @@ setSelectedProduct("");
     await loadWarranties();
   }
 
-  async function deleteWarranty(
-    id: number
-  ) {
+async function cancelWarranty(
+  id: number
+) {
+
+  const confirmed =
+    confirm(
+      "Are you sure you want to cancel this warranty?"
+    );
+
+  if (!confirmed) return;
+
+  const warranty =
+    warranties.find(
+      (w) => w.id === id
+    );
+
+  const { error } =
     await supabase
       .from("warranties")
-      .delete()
+      .update({
+        status:
+          "Cancelled",
+      })
       .eq("id", id);
 
-    loadWarranties();
+  if (error) {
+    alert(error.message);
+    return;
   }
+
+  await supabase
+    .from(
+      "admin_notifications"
+    )
+    .insert([
+      {
+        title:
+          "⚠️ Warranty Cancelled",
+
+        message:
+          `Customer: ${warranty?.customer_name}
+
+Roll: ${warranty?.roll_number}
+
+Center: ${warranty?.center_name}`,
+
+        type:
+          "warranty_cancelled",
+      },
+    ]);
+
+  await loadWarranties();
+}
+
+const today =
+  new Date()
+    .toISOString()
+    .split("T")[0];
+
+const filteredWarranties =
+  warranties.filter((item) => {
+
+    const matchesSearch =
+      item.customer_name
+        ?.toLowerCase()
+        .includes(
+          searchTerm.toLowerCase()
+        ) ||
+      item.vin
+        ?.toLowerCase()
+        .includes(
+          searchTerm.toLowerCase()
+        ) ||
+      item.roll_number
+        ?.toLowerCase()
+        .includes(
+          searchTerm.toLowerCase()
+        );
+
+    const displayStatus =
+      item.status === "Cancelled"
+        ? "Cancelled"
+        : item.end_date < today
+        ? "Expired"
+        : "Active";
+
+    const matchesStatus =
+      statusFilter === "all"
+        ? true
+        : displayStatus
+            .toLowerCase() ===
+          statusFilter;
+
+    return (
+      matchesSearch &&
+      matchesStatus
+    );
+  });
+
+function exportToExcel() {
+
+  const today =
+    new Date()
+      .toISOString()
+      .split("T")[0];
+
+const exportData =
+  filteredWarranties.map(
+    (w) => {
+
+      const displayStatus =
+        w.status === "Cancelled"
+          ? "Cancelled"
+          : w.end_date < today
+          ? "Expired"
+          : "Active";
+
+      return {
+        Customer:
+          w.customer_name,
+
+        VIN:
+          w.vin,
+
+        Roll:
+          w.roll_number,
+
+        Product:
+          w.product_name,
+
+        WarrantyYears:
+          w.duration_years,
+
+        StartDate:
+          w.start_date,
+
+        EndDate:
+          w.end_date,
+
+        Status:
+          displayStatus,
+
+        Governorate:
+          w.governorate,
+
+        City:
+          w.city,
+
+        Center:
+          w.center_name,
+      };
+    });
+
+  const worksheet =
+    XLSX.utils.json_to_sheet(
+      exportData
+    );
+
+  const workbook =
+    XLSX.utils.book_new();
+
+const summaryData = [
+  {
+    Center: centerName,
+
+    ExportDate: today,
+
+    Total:
+      warranties.length,
+
+    Active:
+      warranties.filter(
+        (w) =>
+          w.status !==
+            "Cancelled" &&
+          w.end_date >=
+            today
+      ).length,
+
+    Expired:
+      warranties.filter(
+        (w) =>
+          w.status !==
+            "Cancelled" &&
+          w.end_date <
+            today
+      ).length,
+
+    Cancelled:
+      warranties.filter(
+        (w) =>
+          w.status ===
+          "Cancelled"
+      ).length,
+  },
+];
+
+const summarySheet =
+  XLSX.utils.json_to_sheet(
+    summaryData
+  );
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Warranties"
+  );
+
+XLSX.utils.book_append_sheet(
+  workbook,
+  summarySheet,
+  "Summary"
+);
+
+  XLSX.writeFile(
+    workbook,
+    `Warranties-${today}.xlsx`
+  );
+}
 
 
   async function startVinScanner() {
@@ -1152,14 +1433,80 @@ gap: "12px",
           </p>
           <h2 style={{ color:"#fff" }}>
             {
-              warranties.filter(
-                (w) =>
-                  w.status ===
-                  "Active"
-              ).length
+warranties.filter((w) => {
+  const today =
+    new Date()
+      .toISOString()
+      .split("T")[0];
+
+  return (
+    w.status !== "Cancelled" &&
+    w.end_date >= today
+  );
+}).length
             }
           </h2>
         </div>
+
+<div
+  style={{
+    background:"#202020",
+    border:"1px solid #333",
+    borderRadius:"14px",
+    padding:"16px",
+  }}
+>
+  <p style={{color:"#aaa"}}>
+    Expired
+  </p>
+
+  <h2
+    style={{
+      color:"#ff9800"
+    }}
+  >
+    {
+      warranties.filter((w) => {
+        const today =
+          new Date()
+            .toISOString()
+            .split("T")[0];
+
+        return (
+          w.status !== "Cancelled" &&
+          w.end_date < today
+        );
+      }).length
+    }
+  </h2>
+</div>
+
+<div
+  style={{
+    background:"#202020",
+    border:"1px solid #333",
+    borderRadius:"14px",
+    padding:"16px",
+  }}
+>
+  <p style={{color:"#aaa"}}>
+    Cancelled
+  </p>
+
+  <h2
+    style={{
+      color:"#ff4444"
+    }}
+  >
+    {
+      warranties.filter(
+        (w) =>
+          w.status ===
+          "Cancelled"
+      ).length
+    }
+  </h2>
+</div>
 
         <div
           style={{
@@ -1578,6 +1925,57 @@ gap: "12px",
 
       <hr />
 
+<select
+  value={statusFilter}
+  onChange={(e) =>
+    setStatusFilter(
+      e.target.value
+    )
+  }
+  style={{
+    width: "100%",
+    padding: "14px",
+    borderRadius: "12px",
+    border: "1px solid #333",
+    fontSize: "16px",
+    color: "#fff",
+    background: "#222",
+    marginBottom: "12px",
+  }}
+>
+  <option value="all">
+    All Warranties
+  </option>
+
+  <option value="active">
+    Active
+  </option>
+
+  <option value="expired">
+    Expired
+  </option>
+
+  <option value="cancelled">
+    Cancelled
+  </option>
+</select>
+
+<button
+  onClick={exportToExcel}
+  style={{
+    width:"100%",
+    padding:"14px",
+    borderRadius:"12px",
+    border:"none",
+    background:"#1e88e5",
+    color:"#fff",
+    fontSize:"16px",
+    marginBottom:"12px",
+    cursor:"pointer",
+  }}
+>
+  📊 Export Excel
+</button>
 
       <input
         type="text"
@@ -1601,25 +1999,65 @@ gap: "12px",
       />
 
       {warranties
-        .filter((item) => {
-          const q =
-            searchTerm.toLowerCase();
+       .filter((item) => {
 
-          return (
-            item.customer_name
-              ?.toLowerCase()
-              .includes(q) ||
-            item.vin
-              ?.toLowerCase()
-              .includes(q) ||
-            item.roll_number
-              ?.toLowerCase()
-              .includes(q)
-          );
-        })
-        .map(
-        (item) => (
-          
+  const q =
+    searchTerm.toLowerCase();
+
+  const matchesSearch =
+    item.customer_name
+      ?.toLowerCase()
+      .includes(q) ||
+    item.vin
+      ?.toLowerCase()
+      .includes(q) ||
+    item.roll_number
+      ?.toLowerCase()
+      .includes(q);
+
+  const today =
+    new Date()
+      .toISOString()
+      .split("T")[0];
+
+  const displayStatus =
+    item.status ===
+    "Cancelled"
+      ? "Cancelled"
+      : item.end_date <
+        today
+      ? "Expired"
+      : "Active";
+
+  const matchesStatus =
+    statusFilter === "all"
+      ? true
+      : displayStatus
+          .toLowerCase() ===
+        statusFilter;
+
+  return (
+    matchesSearch &&
+    matchesStatus
+  );
+})
+
+    .map((item) => {
+
+  const today =
+    new Date()
+      .toISOString()
+      .split("T")[0];
+
+  const displayStatus =
+    item.status === "Cancelled"
+      ? "Cancelled"
+      : item.end_date < today
+      ? "Expired"
+      : "Active";
+
+  return (
+
           <div
             key={item.id}
             style={{
@@ -1712,9 +2150,20 @@ gap: "12px",
                 <p style={{color:"#888",fontSize:"12px"}}>
                   Status
                 </p>
-                <p style={{color:"#fff"}}>
-                  {item.status}
-                </p>
+                <p
+  style={{
+color:
+  displayStatus === "Active"
+    ? "#24a444"
+    : displayStatus === "Expired"
+    ? "#ff9800"
+    : "#ff4444",
+    fontWeight: "bold",
+  }}
+>
+  {displayStatus}
+</p>
+
               </div>
 
               <div>
@@ -1767,25 +2216,31 @@ gap: "12px",
   Share
 </button>
 
-                           <button
-                style={{
-                  background:"#7a1f1f",
-                  color:"#fff",
-                  border:"none",
-                  borderRadius:"8px",
-                  padding:"8px 14px",
-                  fontSize:"14px",
-                }}
-                onClick={() =>
-                  deleteWarranty(item.id)
-                }
-              >
-                Delete
-              </button>
+  {item.status !==
+  "Cancelled" && (
+  <button
+    style={{
+      background:"#7a1f1f",
+      color:"#fff",
+      border:"none",
+      borderRadius:"8px",
+      padding:"8px 14px",
+      fontSize:"14px",
+    }}
+    onClick={() =>
+      cancelWarranty(item.id)
+    }
+  >
+    Cancel
+  </button>
+
+)}
+
+             
             </div>
           </div>
-        ))
-      }
+        );
+      })}
 
       </div>
     </div>
