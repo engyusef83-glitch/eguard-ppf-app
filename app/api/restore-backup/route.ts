@@ -2,143 +2,368 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
-process.env.NEXT_PUBLIC_SUPABASE_URL!,
-process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+function removeId(rows: any[]) {
+  return rows.map(({ id, ...row }) => row);
+}
 
 export async function POST(
-request: Request
+  request: Request
 ) {
-try {
+  try {
 
+    const backup =
+      await request.json();
 
-const backup =
-  await request.json();
+    const results: any = {};
 
-const results: any = {};
+    // =========================
+    // PRODUCTS (UUID)
+    // =========================
 
-// PRODUCTS
+    if (
+      backup.products &&
+      backup.products.length > 0
+    ) {
 
-if (
-  backup.products &&
-  backup.products.length > 0
-) {
+      await supabase
+        .from("products")
+        .delete()
+        .not("id", "is", null);
 
-  const deleteProducts =
-    await supabase
-      .from("products")
-      .delete()
-      .not("id", "is", null);
+      const result =
+        await supabase
+          .from("products")
+          .insert(
+            backup.products
+          )
+          .select();
 
-  if (deleteProducts.error) {
+      if (result.error) {
 
-    return NextResponse.json({
-      success: false,
-      stage: "PRODUCTS_DELETE",
-      error:
-        deleteProducts.error.message,
-    });
-  }
+        return NextResponse.json({
+          success: false,
+          stage: "PRODUCTS",
+          error:
+            result.error.message,
+        });
+      }
 
-  const insertProducts =
-    await supabase
-      .from("products")
-      .insert(
-        backup.products
-      )
-      .select();
+      results.products =
+        result.data?.length || 0;
+    }
 
-  if (insertProducts.error) {
+    // =========================
+    // WARRANTIES (UUID)
+    // =========================
 
-    return NextResponse.json({
-      success: false,
-      stage: "PRODUCTS_INSERT",
-      error:
-        insertProducts.error.message,
-    });
-  }
+    if (
+      backup.warranties &&
+      backup.warranties.length > 0
+    ) {
 
-  results.products =
-    insertProducts.data
-      ?.length || 0;
-}
+      await supabase
+        .from("warranties")
+        .delete()
+        .not("id", "is", null);
 
-// ROLL INVENTORY
+      const result =
+        await supabase
+          .from("warranties")
+          .insert(
+            backup.warranties
+          )
+          .select();
 
-if (
-  backup.roll_inventory &&
-  backup.roll_inventory.length > 0
-) {
+      if (result.error) {
 
-  const deleteInventory =
-    await supabase
-      .from("roll_inventory")
-      .delete()
-      .not("id", "is", null);
+        return NextResponse.json({
+          success: false,
+          stage: "WARRANTIES",
+          error:
+            result.error.message,
+        });
+      }
 
-  if (deleteInventory.error) {
+      results.warranties =
+        result.data?.length || 0;
+    }
 
-    return NextResponse.json({
-      success: false,
-      stage:
-        "ROLL_INVENTORY_DELETE",
-      error:
-        deleteInventory.error.message,
-    });
-  }
+    // =========================
+    // CENTERS (UUID)
+    // =========================
 
-  const inventoryData =
-    backup.roll_inventory.map(
-      ({ id, ...row }: any) => row
-    );
+    if (
+      backup.centers &&
+      backup.centers.length > 0
+    ) {
 
-  const insertInventory =
-    await supabase
-      .from("roll_inventory")
-      .insert(
-        inventoryData
-      )
-      .select();
+      await supabase
+        .from("centers")
+        .delete()
+        .not("id", "is", null);
 
-  if (insertInventory.error) {
+      const result =
+        await supabase
+          .from("centers")
+          .insert(
+            backup.centers
+          )
+          .select();
 
-    return NextResponse.json({
-      success: false,
-      stage:
-        "ROLL_INVENTORY_INSERT",
-      error:
-        insertInventory.error.message,
-    });
-  }
+      if (result.error) {
 
-  results.roll_inventory =
-    insertInventory.data
-      ?.length || 0;
-}
+        return NextResponse.json({
+          success: false,
+          stage: "CENTERS",
+          error:
+            result.error.message,
+        });
+      }
 
-return NextResponse.json({
+      results.centers =
+        result.data?.length || 0;
+    }
+
+    // =========================
+    // PROFILES (UUID)
+    // =========================
+
+    if (
+      backup.profiles &&
+      backup.profiles.length > 0
+    ) {
+
+      await supabase
+        .from("profiles")
+        .delete()
+        .not("id", "is", null);
+
+      const result =
+        await supabase
+          .from("profiles")
+          .insert(
+            backup.profiles
+          )
+          .select();
+
+      if (result.error) {
+
+        return NextResponse.json({
+          success: false,
+          stage: "PROFILES",
+          error:
+            result.error.message,
+        });
+      }
+
+      results.profiles =
+        result.data?.length || 0;
+    }
+
+    // =========================
+    // ROLL INVENTORY (BIGINT)
+    // =========================
+
+    if (
+      backup.roll_inventory &&
+      backup.roll_inventory.length > 0
+    ) {
+
+      await supabase
+        .from("roll_inventory")
+        .delete()
+        .not("id", "is", null);
+
+      const result =
+        await supabase
+          .from("roll_inventory")
+          .insert(
+            removeId(
+              backup.roll_inventory
+            )
+          )
+          .select();
+
+      if (result.error) {
+
+        return NextResponse.json({
+          success: false,
+          stage:
+            "ROLL_INVENTORY",
+          error:
+            result.error.message,
+        });
+      }
+
+      results.roll_inventory =
+        result.data?.length || 0;
+    }
+
+    // =========================
+    // ROLL IMPORT HISTORY
+    // =========================
+
+    if (
+      backup.roll_import_history &&
+      backup.roll_import_history.length > 0
+    ) {
+
+      await supabase
+        .from("roll_import_history")
+        .delete()
+        .not("id", "is", null);
+
+      const result =
+        await supabase
+          .from("roll_import_history")
+          .insert(
+            removeId(
+              backup.roll_import_history
+            )
+          )
+          .select();
+
+      if (result.error) {
+
+        return NextResponse.json({
+          success: false,
+          stage:
+            "ROLL_IMPORT_HISTORY",
+          error:
+            result.error.message,
+        });
+      }
+
+      results.roll_import_history =
+        result.data?.length || 0;
+    }
+
+    // =========================
+    // ROLL RELEASE LOG
+    // =========================
+
+    if (
+      backup.roll_release_log &&
+      backup.roll_release_log.length > 0
+    ) {
+
+      await supabase
+        .from("roll_release_log")
+        .delete()
+        .not("id", "is", null);
+
+      const result =
+        await supabase
+          .from("roll_release_log")
+          .insert(
+            removeId(
+              backup.roll_release_log
+            )
+          )
+          .select();
+
+      if (result.error) {
+
+        return NextResponse.json({
+          success: false,
+          stage:
+            "ROLL_RELEASE_LOG",
+          error:
+            result.error.message,
+        });
+      }
+
+      results.roll_release_log =
+        result.data?.length || 0;
+    }
+
+    // =========================
+    // SYSTEM SETTINGS
+    // =========================
+
+    if (
+      backup.system_settings &&
+      backup.system_settings.length > 0
+    ) {
+
+      await supabase
+        .from("system_settings")
+        .delete()
+        .not("id", "is", null);
+
+      const result =
+        await supabase
+          .from("system_settings")
+          .insert(
+            removeId(
+              backup.system_settings
+            )
+          )
+          .select();
+
+      if (result.error) {
+
+        return NextResponse.json({
+          success: false,
+          stage:
+            "SYSTEM_SETTINGS",
+          error:
+            result.error.message,
+        });
+      }
+
+      results.system_settings =
+        result.data?.length || 0;
+    }
+
+ return NextResponse.json({
   success: true,
   stage: "COMPLETE",
-  results,
+  message: "Backup restored successfully",
+  results: {
+    products:
+      results.products || 0,
+
+    warranties:
+      results.warranties || 0,
+
+    centers:
+      results.centers || 0,
+
+    profiles:
+      results.profiles || 0,
+
+    roll_inventory:
+      results.roll_inventory || 0,
+
+    roll_import_history:
+      results.roll_import_history || 0,
+
+    roll_release_log:
+      results.roll_release_log || 0,
+
+    system_settings:
+      results.system_settings || 0,
+  },
 });
 
+  } catch (error: any) {
 
-} catch (error: any) {
-
-
-return NextResponse.json(
-  {
-    success: false,
-    stage: "CATCH",
-    error:
-      error?.message ||
-      String(error),
-  },
-  {
-    status: 500,
+    return NextResponse.json(
+      {
+        success: false,
+        stage: "CATCH",
+        error:
+          error?.message ||
+          String(error),
+      },
+      {
+        status: 500,
+      }
+    );
   }
-);
-
-
-}
 }
