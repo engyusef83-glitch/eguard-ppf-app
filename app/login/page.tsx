@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useState,
+  useEffect,
+} from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -20,6 +23,33 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+const [deferredPrompt, setDeferredPrompt] =
+  useState<any>(null);
+
+const [showInstall, setShowInstall] =
+  useState(false);
+
+useEffect(() => {
+  const handler = (e: any) => {
+    e.preventDefault();
+
+    setDeferredPrompt(e);
+
+    setShowInstall(true);
+  };
+
+  window.addEventListener(
+    "beforeinstallprompt",
+    handler
+  );
+
+  return () =>
+    window.removeEventListener(
+      "beforeinstallprompt",
+      handler
+    );
+}, []);
 
  async function handleLogin() {
   setLoading(true);
@@ -121,6 +151,18 @@ if (
 
 router.push("/admin");
 }
+
+async function installApp() {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+
+  await deferredPrompt.userChoice;
+
+  setDeferredPrompt(null);
+
+  setShowInstall(false);
+}
   return (
     <div
       style={{
@@ -170,6 +212,26 @@ style={{
   >
     Professional Warranty & Inventory Management Platform
   </p>
+
+{showInstall && (
+  <button
+    onClick={installApp}
+    style={{
+      width: "100%",
+      marginTop: "20px",
+      marginBottom: "20px",
+      padding: "14px",
+      background: "#24a444",
+      border: "none",
+      borderRadius: "12px",
+      color: "#fff",
+      fontWeight: "bold",
+      cursor: "pointer",
+    }}
+  >
+    📲 Install EGUARD App
+  </button>
+)}
 </div>
         <input
           type="email"
