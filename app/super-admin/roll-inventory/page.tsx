@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import * as XLSX from "xlsx";
+import { useRouter } from "next/navigation";
 
 
 
@@ -13,6 +14,8 @@ const supabase = createClient(
 
 
 export default function RollInventoryPage() {
+
+const router = useRouter();
 
   const [mode, setMode] =
     useState("disabled");
@@ -68,12 +71,50 @@ const [checkResult, setCheckResult] =
 const [rechecking, setRechecking] =
   useState(false);
 
-  useEffect(() => {
+async function checkAccess() {
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    router.push("/login");
+    return;
+  }
+
+  if (
+    user.email ===
+    "eguard.iraq@gmail.com"
+  ) {
+    return;
+  }
+
+  const {
+    data: profile,
+  } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("email", user.email)
+    .single();
+
+  if (
+    !profile ||
+    profile.role !==
+      "super_admin"
+  ) {
+    router.push("/admin");
+  }
+}
+
+useEffect(() => {
+  checkAccess();
+
   loadStats();
   loadSettings();
   loadImportHistory();
-loadInventoryReport();
+  loadInventoryReport();
 }, []);
+
 
   async function loadSettings() {
   const { data, error } =

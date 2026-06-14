@@ -337,27 +337,28 @@ if (
   return;
 }
 
-const { data: activeWarranty } =
+const { data: existingWarranty } =
   await supabase
     .from("warranties")
-    .select("id")
+    .select(
+      "id, roll_status"
+    )
     .eq(
       "roll_number",
       rollNumber
-    )
-    .eq(
-      "status",
-      "Active"
-    )
-    .limit(1);
+    );
 
-if (
-  activeWarranty &&
-  activeWarranty.length > 0
-) {
+const blockedWarranty =
+  existingWarranty?.find(
+    (w) =>
+      w.roll_status !==
+      "Released"
+  );
+
+if (blockedWarranty) {
 
   alert(
-    "❌ This roll number is already used in another active warranty."
+    "❌ This roll number has already been used."
   );
 
   return;

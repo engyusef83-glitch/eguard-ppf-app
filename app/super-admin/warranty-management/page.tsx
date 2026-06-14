@@ -30,9 +30,49 @@ const [
   setCenterFilter,
 ] = useState("All Centers");
 
-  useEffect(() => {
-    loadData();
-  }, []);
+useEffect(() => {
+  const init = async () => {
+    await checkAccess();
+    await loadData();
+  };
+
+  init();
+}, []);
+
+async function checkAccess() {
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    router.push("/login");
+    return;
+  }
+
+  if (
+    user.email ===
+    "eguard.iraq@gmail.com"
+  ) {
+    return;
+  }
+
+  const {
+    data: profile,
+  } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("email", user.email)
+    .single();
+
+  if (
+    !profile ||
+    profile.role !==
+      "super_admin"
+  ) {
+    router.push("/admin");
+  }
+}
 
   async function loadData() {
 const { data, error } =

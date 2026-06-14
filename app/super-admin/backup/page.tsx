@@ -2,6 +2,8 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -9,6 +11,8 @@ const supabase = createClient(
 );
 
 export default function BackupPage() {
+
+const router = useRouter();
 
 const [backupFile, setBackupFile] =
   useState<any>(null);
@@ -18,6 +22,44 @@ const [backupInfo, setBackupInfo] =
 
 const [restoreText, setRestoreText] =
   useState("");
+useEffect(() => {
+  checkAccess();
+}, []);
+
+async function checkAccess() {
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    router.push("/login");
+    return;
+  }
+
+  if (
+    user.email ===
+    "eguard.iraq@gmail.com"
+  ) {
+    return;
+  }
+
+  const {
+    data: profile,
+  } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("email", user.email)
+    .single();
+
+  if (
+    !profile ||
+    profile.role !==
+      "super_admin"
+  ) {
+    router.push("/admin");
+  }
+}
 
 async function downloadBackup() {
 

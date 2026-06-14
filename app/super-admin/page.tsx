@@ -869,6 +869,25 @@ async function exportWarranties() {
   Warranty Management
 </button>
 
+<button
+  onClick={() =>
+    window.location.href =
+      "/super-admin/backup"
+  }
+  style={{
+    background: "#e91e63",
+    color: "#fff",
+    border: "none",
+    borderRadius: "12px",
+    padding: "14px 18px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    marginLeft: "12px",
+  }}
+>
+  🛡 System Backup
+</button>
+
 
 </div>
 
