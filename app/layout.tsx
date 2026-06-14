@@ -17,6 +17,10 @@ export const metadata = {
 
   description:
     "EGUARD Warranty & Inventory Management Platform",
+
+  manifest: "/manifest.json",
+
+  themeColor: "#24a444",
 };
 
 export default function RootLayout({
