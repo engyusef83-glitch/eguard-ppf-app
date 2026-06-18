@@ -781,11 +781,14 @@ async (decodedText) => {
   () => {}
 );
       } catch (error) {
-        console.error(error);
-        alert(
-          "Camera failed to start"
-        );
-      }
+  console.error("VIN ERROR:", error);
+
+  alert(
+    error instanceof Error
+      ? error.message
+      : JSON.stringify(error)
+  );
+}
     });
   }
 
@@ -879,11 +882,14 @@ async (decodedText) => {
   () => {}
 );
       } catch (error) {
-        console.error(error);
-        alert(
-          "Camera failed to start"
-        );
-      }
+  console.error("ROLL ERROR:", error);
+
+  alert(
+    error instanceof Error
+      ? error.message
+      : JSON.stringify(error)
+  );
+}
     });
   }
 
@@ -1905,7 +1911,7 @@ warranties.filter((w) => {
 </div>
 
 <div
-  id="vin-reader"
+  id="roll-reader"
   style={{
     width: "100%",
     maxWidth: "650px",
