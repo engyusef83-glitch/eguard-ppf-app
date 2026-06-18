@@ -759,16 +759,20 @@ console.log(
 
 await scanner.start(
   backCamera.id,
-
-
   {
     fps: 25,
+
     qrbox: {
-    width: 300,
-  height: 300,
- },
+      width: 300,
+      height: 300,
+    },
 
     aspectRatio: 1.777,
+
+    videoConstraints: {
+      facingMode: "environment",
+      focusMode: "continuous",
+    },
   },
 
 async (decodedText) => {
@@ -862,16 +866,20 @@ console.log(
 
 await scanner.start(
   backCamera.id,
-
-
   {
     fps: 25,
+
     qrbox: {
-    width: 300,
-   height: 300,
-},
-   
+      width: 300,
+      height: 300,
+    },
+
     aspectRatio: 1.777,
+
+    videoConstraints: {
+      facingMode: "environment",
+      focusMode: "continuous",
+    },
   },
 
 
