@@ -25,6 +25,32 @@ export default function WarrantyManagementPage() {
   const [statusFilter, setStatusFilter] =
     useState("All");
 
+const [showEditModal, setShowEditModal] =
+  useState(false);
+
+const [selectedWarranty, setSelectedWarranty] =
+  useState<any>(null);
+
+const [editCustomerName, setEditCustomerName] =
+  useState("");
+
+const [editPhone, setEditPhone] =
+  useState("");
+
+const [editVin, setEditVin] =
+  useState("");
+
+const [editProductName, setEditProductName] =
+  useState("");
+
+const [editRollNumber, setEditRollNumber] =
+  useState("");
+
+const [
+  editInstallationLocation,
+  setEditInstallationLocation,
+] = useState("");
+
 const [
   centerFilter,
   setCenterFilter,
@@ -72,6 +98,103 @@ async function checkAccess() {
   ) {
     router.push("/admin");
   }
+}
+
+function openEditModal(
+  item: any
+) 
+{
+
+setEditRollNumber(
+  item.roll_number || ""
+);
+
+  setSelectedWarranty(item);
+
+  setEditCustomerName(
+    item.customer_name || ""
+  );
+
+  setEditPhone(
+    item.phone || ""
+  );
+
+  setEditVin(
+    item.vin || ""
+  );
+
+  setEditProductName(
+    item.product_name || ""
+  );
+
+
+
+  setEditInstallationLocation(
+  item.location || ""
+);
+
+  setShowEditModal(true);
+}
+
+async function saveWarrantyChanges() {
+
+  if (!selectedWarranty) {
+    return;
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+const { error } =
+  await supabase
+    .from("warranties")
+    .update({
+
+      customer_name:
+        editCustomerName,
+
+      vin:
+        editVin,
+
+      product_name:
+        editProductName,
+
+      roll_number:
+        editRollNumber,
+
+      location:
+        editInstallationLocation,
+
+      updated_at:
+        new Date()
+          .toISOString(),
+
+      updated_by:
+        user?.email,
+
+    })
+    .eq(
+      "id",
+      selectedWarranty.id
+    );
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+  }
+
+  alert(
+    "Warranty Updated Successfully"
+  );
+
+  setShowEditModal(false);
+
+  loadData();
 }
 
   async function loadData() {
@@ -864,29 +987,46 @@ if (item.end_date) {
 </td>
 
 <td style={tdStyle}>
+
+<button
+  onClick={() =>
+    openEditModal(item)
+  }
+  style={{
+    background: "#24a444",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    cursor: "pointer",
+    marginRight: "8px",
+  }}
+>
+  ✏️ Edit
+</button>
+
 {status ===
 "Cancelled" &&
 item.roll_status !==
 "Released" ? (
+
     <button
-  onClick={() =>
-    releaseRoll(item)
-  }
-  style={{
-        background:
-          "#2196f3",
-        color: "#fff",
-        border: "none",
-        borderRadius:
-          "8px",
-        padding:
-          "8px 12px",
-        cursor:
-          "pointer",
+      onClick={() =>
+        releaseRoll(item)
+      }
+      style={{
+        background:"#2196f3",
+        color:"#fff",
+        border:"none",
+        borderRadius:"8px",
+        padding:"8px 12px",
+        cursor:"pointer",
       }}
     >
       🔓 Release Roll
     </button>
+
+
 ) : item.roll_status ===
   "Released" ? (
 
@@ -915,6 +1055,134 @@ item.roll_status !==
           </table>
         </div>
       </div>
+
+      {showEditModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform:
+              "translate(-50%, -50%)",
+            background: "#1b1b1b",
+            color: "#fff",
+            padding: "30px",
+            borderRadius: "12px",
+            border: "1px solid #333",
+            zIndex: 9999,
+          }}
+        >
+          <h2
+  style={{
+    marginBottom: "20px",
+  }}
+>
+  Edit Warranty
+</h2>
+
+<input
+  value={editCustomerName}
+  onChange={(e) =>
+    setEditCustomerName(
+      e.target.value
+    )
+  }
+  placeholder="Customer Name"
+  style={inputStyle}
+/>
+
+<input
+  value={editVin}
+  onChange={(e) =>
+    setEditVin(
+      e.target.value
+    )
+  }
+  placeholder="VIN"
+  style={inputStyle}
+/>
+
+<input
+  value={editProductName}
+  onChange={(e) =>
+    setEditProductName(
+      e.target.value
+    )
+  }
+  placeholder="Product Name"
+  style={inputStyle}
+/>
+
+<input
+  value={editRollNumber}
+  onChange={(e) =>
+    setEditRollNumber(
+      e.target.value
+    )
+  }
+  placeholder="Roll Number"
+  style={inputStyle}
+/>
+
+<input
+  value={
+    editInstallationLocation
+  }
+  onChange={(e) =>
+    setEditInstallationLocation(
+      e.target.value
+    )
+  }
+  placeholder="Location"
+  style={inputStyle}
+/>
+
+<div
+  style={{
+    display: "flex",
+    gap: "10px",
+    marginTop: "15px",
+  }}
+>
+  <button
+    onClick={
+      saveWarrantyChanges
+    }
+    style={{
+      flex: 1,
+      background: "#24a444",
+      color: "#fff",
+      border: "none",
+      padding: "12px",
+      borderRadius: "8px",
+      cursor: "pointer",
+    }}
+  >
+    Save Changes
+  </button>
+
+<button
+  onClick={() =>
+    setShowEditModal(false)
+  }
+  style={{
+    flex: 1,
+    background: "#444",
+    color: "#fff",
+    border: "none",
+    padding: "12px",
+    borderRadius: "8px",
+    cursor: "pointer",
+  }}
+>
+  Cancel
+</button>
+
+</div>
+
+</div>
+
+      )}
     </div>
   );
 }
@@ -940,5 +1208,15 @@ const cardStyle = {
   border: "1px solid #333",
   borderRadius: "12px",
   padding: "16px",
+  color: "#fff",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "12px",
+  marginBottom: "12px",
+  borderRadius: "8px",
+  border: "1px solid #333",
+  background: "#111",
   color: "#fff",
 };
