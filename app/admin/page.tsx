@@ -758,6 +758,7 @@ console.log(
 );
 
 await scanner.start(
+
   backCamera.id,
   {
     fps: 25,
@@ -801,6 +802,26 @@ scannerRef.current =
 },
   () => {}
 );
+
+const video =
+  document.querySelector(
+    "#vin-reader video"
+  ) as HTMLVideoElement | null;
+
+const stream =
+  video?.srcObject as MediaStream | null;
+
+const track =
+  stream?.getVideoTracks()[0];
+
+console.log(
+  JSON.stringify(
+    track?.getCapabilities?.(),
+    null,
+    2
+  )
+);
+
       } catch (error) {
   console.error("VIN ERROR:", error);
 
