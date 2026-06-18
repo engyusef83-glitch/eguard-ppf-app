@@ -712,23 +712,35 @@ XLSX.utils.book_append_sheet(
             "vin-reader"
           );
 
-        await scanner.start(
-          { facingMode: "environment" },
-          {
-            fps: 10,
-            qrbox: 250,
-          },
-          async (decodedText) => {
-            setVin(decodedText);
 
-            await scanner.stop();
 
-            setShowVinScanner(
-              false
-            );
-          },
-          () => {}
-        );
+await scanner.start(
+  {
+    facingMode: {
+      exact: "environment",
+    },
+  },
+  {
+    fps: 20,
+    qrbox: {
+      width: 320,
+      height: 120,
+    },
+    aspectRatio: 1.777,
+  },
+  async (decodedText) => {
+    setVin(decodedText);
+
+    if (navigator.vibrate) {
+      navigator.vibrate(100);
+    }
+
+    await scanner.stop();
+
+    setShowVinScanner(false);
+  },
+  () => {}
+);
       } catch (error) {
         console.error(error);
         alert(
@@ -757,25 +769,33 @@ XLSX.utils.book_append_sheet(
             "roll-reader"
           );
 
-        await scanner.start(
-          { facingMode: "environment" },
-          {
-            fps: 10,
-            qrbox: 250,
-          },
-          async (decodedText) => {
-            setRollNumber(
-              decodedText
-            );
+await scanner.start(
+  {
+    facingMode: {
+      exact: "environment",
+    },
+  },
+  {
+    fps: 20,
+    qrbox: {
+      width: 320,
+      height: 120,
+    },
+    aspectRatio: 1.777,
+  },
+  async (decodedText) => {
+    setRollNumber(decodedText);
 
-            await scanner.stop();
+    if (navigator.vibrate) {
+      navigator.vibrate(100);
+    }
 
-            setShowRollScanner(
-              false
-            );
-          },
-          () => {}
-        );
+    await scanner.stop();
+
+    setShowRollScanner(false);
+  },
+  () => {}
+);
       } catch (error) {
         console.error(error);
         alert(
