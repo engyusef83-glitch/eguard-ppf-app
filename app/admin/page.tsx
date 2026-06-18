@@ -758,8 +758,9 @@ console.log(
 );
 
 await scanner.start(
-
-  backCamera.id,
+  {
+    facingMode: "environment"
+  },
   {
     fps: 25,
 
@@ -885,7 +886,10 @@ console.log(
 );
 
 await scanner.start(
-  backCamera.id,
+  {
+    facingMode: "environment"
+  },
+
   {
     fps: 25,
 
