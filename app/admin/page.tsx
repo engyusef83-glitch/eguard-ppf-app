@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+
 import { Html5Qrcode } from "html5-qrcode";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
+import {
+  useEffect,
+  useState,
+  useRef
+} from "react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -89,12 +94,19 @@ export default function AdminPage() {
   const [scanLock, setScanLock] =
     useState(false);
 
+const scannerRef =
+  useRef<Html5Qrcode | null>(
+    null
+  );
+
   const [language, setLanguage] =
     useState<"en" | "ar">("en");
   const [searchTerm, setSearchTerm] =
     useState("");
 const [products, setProducts] =
   useState<any[]>([]);
+
+
 
 const [
   statusFilter,
@@ -712,9 +724,12 @@ XLSX.utils.book_append_sheet(
         }
 
         const scanner =
-          new Html5Qrcode(
-            "vin-reader"
-          );
+  new Html5Qrcode(
+    "vin-reader"
+  );
+
+scannerRef.current =
+  scanner;
 
 const backCamera =
   cameras.find(
@@ -769,6 +784,9 @@ async (decodedText) => {
   }
 
   await scanner.stop();
+
+scannerRef.current =
+  null;
   
 
   setShowVinScanner(false);
@@ -806,10 +824,15 @@ async (decodedText) => {
           return;
         }
 
-        const scanner =
-          new Html5Qrcode(
-            "roll-reader"
-          );
+
+
+const scanner =
+  new Html5Qrcode(
+    "roll-reader"
+  );
+
+scannerRef.current =
+  scanner;
 
 const backCamera =
   cameras.find(
@@ -870,6 +893,11 @@ async (decodedText) => {
   }
 
   await scanner.stop();
+
+scannerRef.current =
+  null;
+
+
   
 
   setShowRollScanner(false);
@@ -893,6 +921,21 @@ async (decodedText) => {
     });
   }
 
+
+async function closeScanner() {
+  try {
+    if (scannerRef.current) {
+      await scannerRef.current.stop();
+await scannerRef.current.clear();
+      scannerRef.current = null;
+    }
+  } catch (error) {
+    console.log("Scanner already stopped");
+  }
+
+  setShowVinScanner(false);
+  setShowRollScanner(false);
+}
 
   function printWarranty(item: Warranty) {
     const win = window.open("", "_blank");
@@ -1731,9 +1774,7 @@ warranties.filter((w) => {
           <br />
 
           <button
-            onClick={() =>
-              setShowVinScanner(false)
-            }
+            onClick={closeScanner}
           >
             {t.close}
           </button>
@@ -1861,9 +1902,10 @@ warranties.filter((w) => {
         borderRadius:"10px",
         padding:"12px",
       }}
+
       onClick={() =>
-        startRollScanner()
-      }
+  startRollScanner()
+}
     >
       {t.scanRoll}
     </button>
@@ -1922,9 +1964,7 @@ warranties.filter((w) => {
           <br />
 
           <button
-            onClick={() =>
-              setShowRollScanner(false)
-            }
+            onClick={closeScanner}
           >
             {t.close}
           </button>
@@ -2232,6 +2272,9 @@ warranties.filter((w) => {
       : item.end_date < today
       ? "Expired"
       : "Active";
+
+
+
 
   return (
 
