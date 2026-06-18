@@ -769,7 +769,7 @@ async (decodedText) => {
   }
 
   await scanner.stop();
-  await scanner.clear();
+  
 
   setShowVinScanner(false);
 
@@ -867,7 +867,7 @@ async (decodedText) => {
   }
 
   await scanner.stop();
-  await scanner.clear();
+  
 
   setShowRollScanner(false);
 
