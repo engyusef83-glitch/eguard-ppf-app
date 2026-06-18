@@ -712,20 +712,26 @@ XLSX.utils.book_append_sheet(
             "vin-reader"
           );
 
-
+const backCamera =
+  cameras.find(
+    (c) =>
+      c.label
+        .toLowerCase()
+        .includes("back")
+  ) ||
+  cameras[cameras.length - 1];
 
 await scanner.start(
+  backCamera.id,
+
+
   {
-    facingMode: {
-      exact: "environment",
-    },
-  },
-  {
-    fps: 20,
+    fps: 25,
     qrbox: {
-      width: 320,
-      height: 120,
-    },
+  width: 400,
+  height: 180,
+ },
+
     aspectRatio: 1.777,
   },
   async (decodedText) => {
@@ -736,6 +742,7 @@ await scanner.start(
     }
 
     await scanner.stop();
+await scanner.clear();
 
     setShowVinScanner(false);
   },
@@ -769,18 +776,26 @@ await scanner.start(
             "roll-reader"
           );
 
+const backCamera =
+  cameras.find(
+    (c) =>
+      c.label
+        .toLowerCase()
+        .includes("back")
+  ) ||
+  cameras[cameras.length - 1];
+
 await scanner.start(
+  backCamera.id,
+
+
   {
-    facingMode: {
-      exact: "environment",
-    },
-  },
-  {
-    fps: 20,
+    fps: 25,
     qrbox: {
-      width: 320,
-      height: 120,
-    },
+  width: 400,
+  height: 180,
+},
+   
     aspectRatio: 1.777,
   },
   async (decodedText) => {
@@ -791,6 +806,7 @@ await scanner.start(
     }
 
     await scanner.stop();
+await scanner.clear();
 
     setShowRollScanner(false);
   },
@@ -1604,7 +1620,14 @@ warranties.filter((w) => {
             {t.scanner}
           </p>
 
-          <div id="vin-reader"></div>
+          <div
+  id="vin-reader"
+  style={{
+    width: "100%",
+    maxWidth: "500px",
+    margin: "0 auto",
+  }}
+></div>
 
           <br />
 
@@ -1761,7 +1784,14 @@ warranties.filter((w) => {
             {t.scanner}
           </p>
 
-          <div id="roll-reader"></div>
+          <div
+  id="roll-reader"
+  style={{
+    width: "100%",
+    maxWidth: "500px",
+    margin: "0 auto",
+  }}
+></div>
 
           <br />
 
