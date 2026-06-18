@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4",
+    "@zxing/browser": "^0.2.0",
     "file-saver": "^2.0.5",
     "html5-qrcode": "^2.3.8",
     "jspdf": "^4.2.1",

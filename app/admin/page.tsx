@@ -11,6 +11,9 @@ import {
   useState,
   useRef
 } from "react";
+import {
+  BrowserMultiFormatReader
+} from "@zxing/browser";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -96,6 +99,11 @@ export default function AdminPage() {
 
 const scannerRef =
   useRef<Html5Qrcode | null>(
+    null
+  );
+
+const zxingRef =
+  useRef<BrowserMultiFormatReader | null>(
     null
   );
 
@@ -771,9 +779,7 @@ await scanner.start(
 
     aspectRatio: 1.777,
 
-videoConstraints: {
-  facingMode: "environment",
-} as any,
+
   },
 
 async (decodedText) => {
@@ -782,7 +788,12 @@ async (decodedText) => {
 
   setScanLock(true);
 
-  setVin(decodedText);
+  const cleaned =
+  decodedText
+    .trim()
+    .replace(/\s+/g, "");
+
+setVin(cleaned);
 
   if (navigator.vibrate) {
     navigator.vibrate(100);
@@ -804,24 +815,7 @@ scannerRef.current =
   () => {}
 );
 
-const video =
-  document.querySelector(
-    "#vin-reader video"
-  ) as HTMLVideoElement | null;
 
-const stream =
-  video?.srcObject as MediaStream | null;
-
-const track =
-  stream?.getVideoTracks()[0];
-
-console.log(
-  JSON.stringify(
-    track?.getCapabilities?.(),
-    null,
-    2
-  )
-);
 
       } catch (error) {
   console.error("VIN ERROR:", error);
@@ -900,9 +894,7 @@ await scanner.start(
 
     aspectRatio: 1.777,
 
-    videoConstraints: {
-  facingMode: "environment",
-} as any,
+
   },
 
 
