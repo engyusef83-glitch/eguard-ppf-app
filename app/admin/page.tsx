@@ -877,9 +877,8 @@ await scanner.start(
     aspectRatio: 1.777,
 
     videoConstraints: {
-      facingMode: "environment",
-      focusMode: "continuous",
-    },
+  facingMode: "environment",
+} as any,
   },
 
 
