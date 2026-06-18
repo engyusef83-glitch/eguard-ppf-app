@@ -85,6 +85,10 @@ export default function AdminPage() {
 
   const [showRollScanner, setShowRollScanner] =
     useState(false);
+
+  const [scanLock, setScanLock] =
+    useState(false);
+
   const [language, setLanguage] =
     useState<"en" | "ar">("en");
   const [searchTerm, setSearchTerm] =
@@ -719,7 +723,24 @@ const backCamera =
         .toLowerCase()
         .includes("back")
   ) ||
+  cameras.find(
+    (c) =>
+      c.label
+        .toLowerCase()
+        .includes("rear")
+  ) ||
+  cameras.find(
+    (c) =>
+      c.label
+        .toLowerCase()
+        .includes("wide")
+  ) ||
   cameras[cameras.length - 1];
+
+console.log(
+  "Selected Camera:",
+  backCamera.label
+);
 
 await scanner.start(
   backCamera.id,
@@ -728,24 +749,35 @@ await scanner.start(
   {
     fps: 25,
     qrbox: {
-  width: 400,
-  height: 180,
+    width: 300,
+  height: 300,
  },
 
     aspectRatio: 1.777,
   },
-  async (decodedText) => {
-    setVin(decodedText);
 
-    if (navigator.vibrate) {
-      navigator.vibrate(100);
-    }
+async (decodedText) => {
 
-    await scanner.stop();
-await scanner.clear();
+  if (scanLock) return;
 
-    setShowVinScanner(false);
-  },
+  setScanLock(true);
+
+  setVin(decodedText);
+
+  if (navigator.vibrate) {
+    navigator.vibrate(100);
+  }
+
+  await scanner.stop();
+  await scanner.clear();
+
+  setShowVinScanner(false);
+
+  setTimeout(() => {
+    setScanLock(false);
+  }, 1000);
+
+},
   () => {}
 );
       } catch (error) {
@@ -783,7 +815,24 @@ const backCamera =
         .toLowerCase()
         .includes("back")
   ) ||
+  cameras.find(
+    (c) =>
+      c.label
+        .toLowerCase()
+        .includes("rear")
+  ) ||
+  cameras.find(
+    (c) =>
+      c.label
+        .toLowerCase()
+        .includes("wide")
+  ) ||
   cameras[cameras.length - 1];
+
+console.log(
+  "Selected Camera:",
+  backCamera.label
+);
 
 await scanner.start(
   backCamera.id,
@@ -792,24 +841,41 @@ await scanner.start(
   {
     fps: 25,
     qrbox: {
-  width: 400,
-  height: 180,
+    width: 300,
+   height: 300,
 },
    
     aspectRatio: 1.777,
   },
-  async (decodedText) => {
-    setRollNumber(decodedText);
 
-    if (navigator.vibrate) {
-      navigator.vibrate(100);
-    }
 
-    await scanner.stop();
-await scanner.clear();
+async (decodedText) => {
 
-    setShowRollScanner(false);
-  },
+  if (scanLock) return;
+
+  setScanLock(true);
+
+  const cleaned =
+    decodedText
+      .trim()
+      .replace(/\s+/g, "");
+
+  setRollNumber(cleaned);
+
+  if (navigator.vibrate) {
+    navigator.vibrate(100);
+  }
+
+  await scanner.stop();
+  await scanner.clear();
+
+  setShowRollScanner(false);
+
+  setTimeout(() => {
+    setScanLock(false);
+  }, 1000);
+
+},
   () => {}
 );
       } catch (error) {
@@ -1620,11 +1686,38 @@ warranties.filter((w) => {
             {t.scanner}
           </p>
 
-          <div
+<p
+  style={{
+    color: "#24A444",
+    fontSize: "14px",
+    textAlign: "center",
+    marginBottom: "10px",
+  }}
+>
+  Hold camera 15-25 cm from barcode
+</p>
+
+<div
+  style={{
+    border: "2px dashed #24A444",
+    borderRadius: "12px",
+    height: "80px",
+    marginBottom: "12px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#24A444",
+    fontWeight: "bold",
+  }}
+>
+  Place Barcode Here
+</div>
+
+<div
   id="vin-reader"
   style={{
     width: "100%",
-    maxWidth: "500px",
+    maxWidth: "650px",
     margin: "0 auto",
   }}
 ></div>
@@ -1784,11 +1877,38 @@ warranties.filter((w) => {
             {t.scanner}
           </p>
 
-          <div
-  id="roll-reader"
+<p
+  style={{
+    color: "#24A444",
+    fontSize: "14px",
+    textAlign: "center",
+    marginBottom: "10px",
+  }}
+>
+  Hold camera 15-25 cm from barcode
+</p>
+
+<div
+  style={{
+    border: "2px dashed #24A444",
+    borderRadius: "12px",
+    height: "80px",
+    marginBottom: "12px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#24A444",
+    fontWeight: "bold",
+  }}
+>
+  Place Barcode Here
+</div>
+
+<div
+  id="vin-reader"
   style={{
     width: "100%",
-    maxWidth: "500px",
+    maxWidth: "650px",
     margin: "0 auto",
   }}
 ></div>
