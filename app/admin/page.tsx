@@ -13,9 +13,7 @@ import {
 } from "react";
 
 import {
-  BrowserMultiFormatReader,
-  BarcodeFormat,
-  DecodeHintType
+  BrowserMultiFormatReader
 } from "@zxing/browser";
 
 const supabase = createClient(
