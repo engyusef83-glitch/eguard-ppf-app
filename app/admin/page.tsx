@@ -11,8 +11,11 @@ import {
   useState,
   useRef
 } from "react";
+
 import {
-  BrowserMultiFormatReader
+  BrowserMultiFormatReader,
+  BarcodeFormat,
+  DecodeHintType
 } from "@zxing/browser";
 
 const supabase = createClient(
@@ -986,7 +989,13 @@ async function startZXingTest() {
           "zxing-video",
           (result, error) => {
 
-            if (result) {
+  console.log(
+    "ZXING CALLBACK",
+    result,
+    error
+  );
+
+  if (result) {
 
               const text =
                 result.getText();
