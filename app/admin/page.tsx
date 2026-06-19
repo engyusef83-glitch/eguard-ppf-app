@@ -983,7 +983,11 @@ async function startZXingTest() {
       try {
 
         await reader.decodeFromVideoDevice(
-          undefined,
+          {
+  facingMode: "environment",
+  width: 1920,
+  height: 1080
+},
           "zxing-video",
           (result, error) => {
 
@@ -992,6 +996,13 @@ async function startZXingTest() {
     result,
     error
   );
+
+if (error) {
+  console.log(
+    error.constructor.name
+  );
+}
+
 
   if (result) {
 
@@ -1833,7 +1844,7 @@ warranties.filter((w) => {
   style={{
     width: "100%",
     maxWidth: "500px",
-    height: "350px",
+    height: "500px",
     background: "#000",
     borderRadius: "12px"
   }}
