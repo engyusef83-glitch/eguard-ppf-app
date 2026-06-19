@@ -12,10 +12,6 @@ import {
   useRef
 } from "react";
 
-import {
-  BrowserMultiFormatReader
-} from "@zxing/browser";
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -95,19 +91,11 @@ export default function AdminPage() {
   const [showRollScanner, setShowRollScanner] =
     useState(false);
 
-const [showZXingTest, setShowZXingTest] =
-  useState(false);
-
   const [scanLock, setScanLock] =
     useState(false);
 
 const scannerRef =
   useRef<Html5Qrcode | null>(
-    null
-  );
-
-const zxingRef =
-  useRef<BrowserMultiFormatReader | null>(
     null
   );
 
@@ -783,7 +771,9 @@ await scanner.start(
 
     aspectRatio: 1.777,
 
-
+videoConstraints: {
+  facingMode: "environment",
+} as any,
   },
 
 async (decodedText) => {
@@ -792,12 +782,7 @@ async (decodedText) => {
 
   setScanLock(true);
 
-  const cleaned =
-  decodedText
-    .trim()
-    .replace(/\s+/g, "");
-
-setVin(cleaned);
+  setVin(decodedText);
 
   if (navigator.vibrate) {
     navigator.vibrate(100);
@@ -819,7 +804,24 @@ scannerRef.current =
   () => {}
 );
 
+const video =
+  document.querySelector(
+    "#vin-reader video"
+  ) as HTMLVideoElement | null;
 
+const stream =
+  video?.srcObject as MediaStream | null;
+
+const track =
+  stream?.getVideoTracks()[0];
+
+console.log(
+  JSON.stringify(
+    track?.getCapabilities?.(),
+    null,
+    2
+  )
+);
 
       } catch (error) {
   console.error("VIN ERROR:", error);
@@ -898,7 +900,9 @@ await scanner.start(
 
     aspectRatio: 1.777,
 
-
+    videoConstraints: {
+  facingMode: "environment",
+} as any,
   },
 
 
@@ -962,89 +966,6 @@ await scannerRef.current.clear();
 
   setShowVinScanner(false);
   setShowRollScanner(false);
-}
-
-async function startZXingTest() {
-
-  alert("ZXing started");
-
-  try {
-
-    setShowZXingTest(true);
-
-    const reader =
-      new BrowserMultiFormatReader();
-
-    zxingRef.current =
-      reader;
-
-    setTimeout(async () => {
-
-      try {
-
-        await reader.decodeFromVideoDevice(
-          {
-  facingMode: "environment",
-  width: 1920,
-  height: 1080
-},
-          "zxing-video",
-          (result, error) => {
-
-  console.log(
-    "ZXING CALLBACK",
-    result,
-    error
-  );
-
-if (error) {
-  console.log(
-    error.constructor.name
-  );
-}
-
-
-  if (result) {
-
-              const text =
-                result.getText();
-
-              alert(
-                "ZXing Read:\n\n" + text
-              );
-
-              setVin(text);
-
-             
-              zxingRef.current =
-                null;
-
-              setShowZXingTest(false);
-            }
-
-          }
-        );
-
-      } catch (err) {
-
-        console.error(
-          "ZXing Camera Error:",
-          err
-        );
-
-        alert(
-          "ZXing Camera Error"
-        );
-      }
-
-    }, 1000);
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert("ZXing Failed");
-  }
 }
 
   function printWarranty(item: Warranty) {
@@ -1831,37 +1752,6 @@ warranties.filter((w) => {
 
         </div>
 
-{showZXingTest && (
-
-  <div>
-    <h3>ZXing Test</h3>
-
-<video
-  id="zxing-video"
-  autoPlay
-  playsInline
-  muted
-  style={{
-    width: "100%",
-    maxWidth: "500px",
-    height: "500px",
-    background: "#000",
-    borderRadius: "12px"
-  }}
-/>
-
-<button
-  onClick={() => {
-    zxingRef.current = null;
-    setShowZXingTest(false);
-  }}
->
-  Close
-</button>
-  </div>
-
-)}
-
 {showVinScanner && (
         <div
           style={{
@@ -1875,7 +1765,6 @@ warranties.filter((w) => {
           <p style={{ color: "#fff" }}>
             {t.scanner}
           </p>
-
 
 <p
   style={{
@@ -1997,24 +1886,7 @@ warranties.filter((w) => {
     >
       {t.scanVin}
     </button>
-
-<button
-  style={{
-    background:"#24A444",
-    color:"#fff",
-    borderRadius:"10px",
-    padding:"12px",
-  }}
-  onClick={() =>
-    startZXingTest()
-  }
->
-  Test ZXing
-</button>
-
   </div>
-
-
 
   {/* Roll */}
   <label
