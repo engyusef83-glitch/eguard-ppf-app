@@ -94,6 +94,9 @@ export default function AdminPage() {
   const [showRollScanner, setShowRollScanner] =
     useState(false);
 
+const [showZXingTest, setShowZXingTest] =
+  useState(false);
+
   const [scanLock, setScanLock] =
     useState(false);
 
@@ -960,6 +963,72 @@ await scannerRef.current.clear();
   setShowRollScanner(false);
 }
 
+async function startZXingTest() {
+
+  alert("ZXing started");
+
+  try {
+
+    setShowZXingTest(true);
+
+    const reader =
+      new BrowserMultiFormatReader();
+
+    zxingRef.current =
+      reader;
+
+    setTimeout(async () => {
+
+      try {
+
+        await reader.decodeFromVideoDevice(
+          undefined,
+          "zxing-video",
+          (result, error) => {
+
+            if (result) {
+
+              const text =
+                result.getText();
+
+              alert(
+                "ZXing Read:\n\n" + text
+              );
+
+              setVin(text);
+
+             
+              zxingRef.current =
+                null;
+
+              setShowZXingTest(false);
+            }
+
+          }
+        );
+
+      } catch (err) {
+
+        console.error(
+          "ZXing Camera Error:",
+          err
+        );
+
+        alert(
+          "ZXing Camera Error"
+        );
+      }
+
+    }, 1000);
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert("ZXing Failed");
+  }
+}
+
   function printWarranty(item: Warranty) {
     const win = window.open("", "_blank");
     if (!win) return;
@@ -1744,6 +1813,37 @@ warranties.filter((w) => {
 
         </div>
 
+{showZXingTest && (
+
+  <div>
+    <h3>ZXing Test</h3>
+
+<video
+  id="zxing-video"
+  autoPlay
+  playsInline
+  muted
+  style={{
+    width: "100%",
+    maxWidth: "500px",
+    height: "350px",
+    background: "#000",
+    borderRadius: "12px"
+  }}
+/>
+
+<button
+  onClick={() => {
+    zxingRef.current = null;
+    setShowZXingTest(false);
+  }}
+>
+  Close
+</button>
+  </div>
+
+)}
+
 {showVinScanner && (
         <div
           style={{
@@ -1757,6 +1857,7 @@ warranties.filter((w) => {
           <p style={{ color: "#fff" }}>
             {t.scanner}
           </p>
+
 
 <p
   style={{
@@ -1878,7 +1979,24 @@ warranties.filter((w) => {
     >
       {t.scanVin}
     </button>
+
+<button
+  style={{
+    background:"#24A444",
+    color:"#fff",
+    borderRadius:"10px",
+    padding:"12px",
+  }}
+  onClick={() =>
+    startZXingTest()
+  }
+>
+  Test ZXing
+</button>
+
   </div>
+
+
 
   {/* Roll */}
   <label
