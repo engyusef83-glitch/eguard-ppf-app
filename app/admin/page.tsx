@@ -2182,20 +2182,19 @@ warranties.filter((w) => {
     border: "none",
     fontSize: "16px",
     color: "#fff",
-    cursor: "pointer",
     marginBottom: "20px",
-background:
-  saving
+    background:
+    saving
     ? "#555"
     : "#24A444",
 
-cursor:
-  saving
+    cursor:
+    saving
     ? "not-allowed"
     : "pointer",
 
-opacity:
-  saving
+    opacity:
+    saving
     ? 0.7
     : 1,
   }}
