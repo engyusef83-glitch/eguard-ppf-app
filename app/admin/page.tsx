@@ -2181,7 +2181,6 @@ warranties.filter((w) => {
     borderRadius: "12px",
     border: "none",
     fontSize: "16px",
-    background: "#24A444",
     color: "#fff",
     cursor: "pointer",
     marginBottom: "20px",
