@@ -94,6 +94,9 @@ export default function AdminPage() {
   const [scanLock, setScanLock] =
     useState(false);
 
+const [saving, setSaving] =
+  useState(false);
+
 const scannerRef =
   useRef<Html5Qrcode | null>(
     null
@@ -254,11 +257,19 @@ if (
   }
 
   async function addWarranty() {
+
+if (saving) return;
+
+setSaving(true);
+
     const product = products.find(
       (p) => p.name === selectedProduct
     );
 
-    if (!product) return;
+    if (!product) {
+  setSaving(false);
+  return;
+}
 
     const startDate = new Date();
     const endDate = new Date();
@@ -377,6 +388,8 @@ if (blockedWarranty) {
     "❌ This roll number has already been used."
   );
 
+  setSaving(false);
+
   return;
 }
 
@@ -450,9 +463,13 @@ if (!error) {
 }
 
     if (error) {
-      alert(error.message);
-      return;
-    }
+
+  setSaving(false);
+
+  alert(error.message);
+
+  return;
+}
 
 await supabase
   .from("admin_notifications")
@@ -485,6 +502,7 @@ Product: ${selectedProduct}`
     setCity("");
 setSelectedProduct("");
 
+setSaving(false);
     await loadWarranties();
   }
 
@@ -2155,6 +2173,7 @@ warranties.filter((w) => {
 
 
         <button
+  disabled={saving}
   onClick={addWarranty}
   style={{
     width: "100%",
@@ -2166,9 +2185,27 @@ warranties.filter((w) => {
     color: "#fff",
     cursor: "pointer",
     marginBottom: "20px",
+background:
+  saving
+    ? "#555"
+    : "#24A444",
+
+cursor:
+  saving
+    ? "not-allowed"
+    : "pointer",
+
+opacity:
+  saving
+    ? 0.7
+    : 1,
   }}
 >
-  {t.add}
+  {
+  saving
+    ? "Saving..."
+    : t.add
+}
 </button>
 
       <hr />
