@@ -22,6 +22,9 @@ export default function WarrantyManagementPage() {
   const [products, setProducts] =
     useState<any[]>([]);
 
+const [centersData, setCentersData] =
+  useState<any[]>([]);
+
   const [search, setSearch] =
     useState("");
 
@@ -267,6 +270,28 @@ if (productsError) {
 setProducts(
   productsData || []
 );
+const {
+  data: centersResult,
+  error: centersError,
+} = await supabase
+  .from("centers")
+  .select(
+    "user_id, center_name"
+  )
+  .order(
+    "center_name"
+  );
+
+if (centersError) {
+  console.error(
+    "CENTERS ERROR:",
+    centersError
+  );
+}
+
+setCentersData(
+  centersResult || []
+);
     setLoading(false);
   }
 
@@ -343,17 +368,7 @@ setProducts(
   }
 
 
-const centers =
-  Array.from(
-    new Set(
-      warranties
-        .map(
-          (w) =>
-            w.center_name
-        )
-        .filter(Boolean)
-    )
-  ).sort();
+
 
   const filteredWarranties =
     warranties.filter(
@@ -392,7 +407,7 @@ const matchesCenter =
   centerFilter ===
   "All Centers"
     ? true
-    : item.center_name ===
+    : item.center_user_id ===
       centerFilter;
 
 return (
@@ -781,19 +796,21 @@ async function releaseRoll(
     minWidth: "220px",
   }}
 >
-  <option>
-    All Centers
-  </option>
 
-  {centers.map(
-    (center) => (
-      <option
-        key={center}
-      >
-        {center}
-      </option>
-    )
-  )}
+<option value="All Centers">
+  All Centers
+</option>
+
+{centersData.map(
+  (center) => (
+    <option
+      key={center.user_id}
+      value={center.user_id}
+    >
+      {center.center_name}
+    </option>
+  )
+)}
 </select>
 
         </div>
