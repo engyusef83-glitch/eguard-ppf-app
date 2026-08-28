@@ -85,6 +85,12 @@ export default function AdminPage() {
   const [selectedProduct, setSelectedProduct] =
   useState("");
 
+const [productLocked, setProductLocked] =
+  useState(false);
+
+const [rollProductMessage, setRollProductMessage] =
+  useState("");
+
   const [warranties, setWarranties] =
     useState<Warranty[]>([]);
 
@@ -267,6 +273,80 @@ if (
     router.push("/login");
   }
 
+async function checkRollProduct(
+  rollValue: string
+) {
+  const cleanedRoll =
+    rollValue
+      .trim()
+      .replace(/\s+/g, "");
+
+  if (!cleanedRoll) {
+    setProductLocked(false);
+    setRollProductMessage("");
+    return;
+  }
+
+  const {
+    data,
+    error,
+  } = await supabase
+    .from("roll_inventory")
+    .select(
+      "roll_number, product_name"
+    )
+    .eq(
+      "roll_number",
+      cleanedRoll
+    )
+    .maybeSingle();
+
+  if (error) {
+    console.error(
+      "ROLL PRODUCT CHECK ERROR:",
+      error
+    );
+
+    setProductLocked(false);
+    setRollProductMessage("");
+    return;
+  }
+
+  if (
+    data &&
+    data.product_name
+  ) {
+    const matchedProduct = products.find(
+  (p) =>
+    p.name
+      ?.trim()
+      .toLowerCase() ===
+    data.product_name
+      ?.trim()
+      .toLowerCase()
+);
+
+if (matchedProduct) {
+    setSelectedProduct(matchedProduct.name);
+} else {
+    setSelectedProduct(data.product_name);
+}
+
+    setProductLocked(true);
+
+    setRollProductMessage(
+      language === "ar"
+        ? "✓ تم التعرف على المنتج من سجل الرولات وتم تحديده تلقائياً."
+        : "✓ Product detected from Roll Inventory and selected automatically."
+    );
+
+    return;
+  }
+
+  setProductLocked(false);
+  setRollProductMessage("");
+}
+
   async function addWarranty() {
 
 if (saving) return;
@@ -274,8 +354,14 @@ if (saving) return;
 setSaving(true);
 
     const product = products.find(
-      (p) => p.name === selectedProduct
-    );
+  (p) =>
+    p.name
+      ?.trim()
+      .toLowerCase() ===
+    selectedProduct
+      ?.trim()
+      .toLowerCase()
+);
 
     if (!product) {
   setSaving(false);
@@ -949,11 +1035,13 @@ async (decodedText) => {
 
   setRollNumber(cleaned);
 
-  if (navigator.vibrate) {
-    navigator.vibrate(100);
-  }
+await checkRollProduct(cleaned);
 
-  await scanner.stop();
+if (navigator.vibrate) {
+  navigator.vibrate(100);
+}
+
+await scanner.stop();
 
 scannerRef.current =
   null;
@@ -1940,11 +2028,13 @@ warranties.filter((w) => {
       type="text"
       placeholder={t.roll}
       value={rollNumber}
-      onChange={(e) =>
-        setRollNumber(
-          e.target.value
-        )
-      }
+      onChange={async (e) => {
+  const value = e.target.value;
+
+  setRollNumber(value);
+
+  await checkRollProduct(value);
+}}
       style={{
         flex:1,
         padding:"14px",
@@ -2159,6 +2249,7 @@ warranties.filter((w) => {
       background: "#222",
     }}
     value={selectedProduct}
+disabled={productLocked}
     onChange={(e) =>
       setSelectedProduct(
         e.target.value
@@ -2181,6 +2272,23 @@ warranties.filter((w) => {
       )
     )}
   </select>
+
+{rollProductMessage && (
+  <div
+    style={{
+      marginTop: "8px",
+      padding: "10px",
+      borderRadius: "8px",
+      background: "#1d3b25",
+      color: "#7CFF9A",
+      fontSize: "14px",
+      fontWeight: "600",
+    }}
+  >
+    {rollProductMessage}
+  </div>
+)}
+
 </div>
 
 
