@@ -19,6 +19,9 @@ export default function WarrantyManagementPage() {
   const [warranties, setWarranties] =
     useState<any[]>([]);
 
+  const [products, setProducts] =
+    useState<any[]>([]);
+
   const [search, setSearch] =
     useState("");
 
@@ -145,26 +148,58 @@ async function saveWarrantyChanges() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+const selectedProduct =
+  products.find(
+    (p) =>
+      p.name === editProductName
+  );
+
+let newEndDate =
+  selectedWarranty.end_date;
+
+if (
+  selectedProduct &&
+  selectedWarranty.start_date
+) {
+
+  const start =
+    new Date(
+      selectedWarranty.start_date
+    );
+
+  start.setFullYear(
+    start.getFullYear() +
+    Number(
+      selectedProduct.warranty_years
+    )
+  );
+
+  newEndDate =
+    start
+      .toISOString()
+      .split("T")[0];
+}
 
 const { error } =
   await supabase
     .from("warranties")
     .update({
 
-      customer_name:
-        editCustomerName,
+customer_name: editCustomerName,
 
-      vin:
-        editVin,
+vin: editVin,
 
-      product_name:
-        editProductName,
+product_name: editProductName,
 
-      roll_number:
-        editRollNumber,
+duration_years:
+  selectedProduct?.warranty_years,
 
-      location:
-        editInstallationLocation,
+end_date:
+  newEndDate,
+
+roll_number: editRollNumber,
+
+location: editInstallationLocation,
 
       updated_at:
         new Date()
@@ -214,6 +249,24 @@ console.log(
 );
 
     setWarranties(data || []);
+const {
+  data: productsData,
+  error: productsError,
+} = await supabase
+  .from("products")
+  .select("*")
+  .order("name");
+
+if (productsError) {
+  console.error(
+    "PRODUCTS ERROR:",
+    productsError
+  );
+}
+
+setProducts(
+  productsData || []
+);
     setLoading(false);
   }
 
@@ -1080,16 +1133,32 @@ item.roll_status !==
   Edit Warranty
 </h2>
 
-<input
-  value={editCustomerName}
+<select
+  value={editProductName}
   onChange={(e) =>
-    setEditCustomerName(
+    setEditProductName(
       e.target.value
     )
   }
-  placeholder="Customer Name"
   style={inputStyle}
-/>
+>
+
+  <option value="">
+    Select Product
+  </option>
+
+  {products.map((product) => (
+
+    <option
+      key={product.id}
+      value={product.name}
+    >
+      {product.name}
+    </option>
+
+  ))}
+
+</select>
 
 <input
   value={editVin}
