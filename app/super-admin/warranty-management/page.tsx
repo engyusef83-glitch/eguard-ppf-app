@@ -1,5 +1,5 @@
 "use client";
-
+                                 
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
@@ -340,6 +340,24 @@ setCentersData(
     return "Active";
   }
 
+function getCurrentCenterName(
+  centerUserId: string,
+  fallbackName?: string
+) {
+  const center =
+    centersData.find(
+      (c) =>
+        c.user_id ===
+        centerUserId
+    );
+
+  return (
+    center?.center_name ||
+    fallbackName ||
+    "Unknown Center"
+  );
+}
+
   function getStatusColor(
     status: string
   ) {
@@ -349,6 +367,8 @@ setCentersData(
     ) {
       return "#ff4444";
     }
+
+
 
     if (
       status ===
@@ -392,9 +412,12 @@ setCentersData(
           item.vin
             ?.toLowerCase()
             .includes(q) ||
-          item.center_name
-            ?.toLowerCase()
-            .includes(q);
+          getCurrentCenterName(
+    item.center_user_id,
+    item.center_name
+)
+.toLowerCase()
+.includes(q);
 
         const matchesStatus =
           statusFilter ===
@@ -554,8 +577,10 @@ await supabase
             item.customer_name,
 
           Center:
-            item.center_name ||
-            "Unknown Center",
+    getCurrentCenterName(
+        item.center_user_id,
+        item.center_name
+    ),
 
           Product:
             item.product_name,
@@ -991,10 +1016,11 @@ if (item.end_date) {
                       }
                     >
                       <td style={tdStyle}>
-                        {
-                          item.customer_name
-                        }
-                      </td>
+    {getCurrentCenterName(
+        item.center_user_id,
+        item.center_name
+    )}
+</td>
 
                       <td style={tdStyle}>
                         {
