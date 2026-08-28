@@ -79,6 +79,9 @@ export default function AdminPage() {
   const [centerName, setCenterName] =
     useState("");
 
+  const [centerUserId, setCenterUserId] =
+    useState("");
+
   const [selectedProduct, setSelectedProduct] =
   useState("");
 
@@ -203,13 +206,20 @@ const [
       .single();
 
     if (data) {
-      setCenterName(
-        data.center_name
-      );
 
-      await loadWarranties(
-        data.center_name
-      );
+    setCenterName(data.center_name);
+
+    setCenterUserId(data.user_id);
+console.log(
+    "CENTER USER ID:",
+    data.user_id
+);
+
+    await loadWarranties(
+        data.user_id
+    );
+
+    
 const {
   data: productsData,
 } = await supabase
@@ -230,26 +240,27 @@ if (
   }
 
   async function loadWarranties(
-    currentCenterName?: string
-  ) {
-    const center =
-      currentCenterName ||
-      centerName;
+    currentCenterUserId?: string
+) {
+
+    const centerId =
+        currentCenterUserId ||
+        centerUserId;
 
     const { data } =
-      await supabase
-        .from("warranties")
-        .select("*")
-        .eq(
-          "center_name",
-          center
-        )
-        .order("id", {
-          ascending: false,
-        });
+        await supabase
+            .from("warranties")
+            .select("*")
+            .eq(
+                "center_user_id",
+                centerId
+            )
+            .order("id", {
+                ascending: false,
+            });
 
     setWarranties(data || []);
-  }
+}
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -400,6 +411,7 @@ if (blockedWarranty) {
           {
             customer_name:
               customerName,
+            center_user_id: centerUserId,
 
             vin: vin,
 
