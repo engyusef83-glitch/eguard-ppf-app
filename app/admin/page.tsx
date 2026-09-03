@@ -1297,11 +1297,50 @@ win.onload = () => {
   win.print();
 };
   }
+
 async function shareWarranty(item: Warranty) {
   try {
     const doc = new jsPDF();
 
-const green = [36, 164, 68];
+    const fontResponse = await fetch(
+      "/fonts/NotoNaskhArabic-Regular.ttf"
+    );
+
+    if (!fontResponse.ok) {
+      throw new Error(
+        "Arabic font could not be loaded."
+      );
+    }
+
+    const fontBuffer =
+      await fontResponse.arrayBuffer();
+
+    const fontBytes =
+      new Uint8Array(fontBuffer);
+
+    let binary = "";
+
+    for (let i = 0; i < fontBytes.length; i++) {
+      binary += String.fromCharCode(
+        fontBytes[i]
+      );
+    }
+
+    const fontBase64 =
+      btoa(binary);
+
+    doc.addFileToVFS(
+      "NotoNaskhArabic-Regular.ttf",
+      fontBase64
+    );
+
+    doc.addFont(
+      "NotoNaskhArabic-Regular.ttf",
+      "NotoNaskhArabic",
+      "normal"
+    );
+
+    const green = [36, 164, 68];
 
 doc.setFillColor(245, 245, 245);
 doc.rect(0, 0, 210, 297, "F");
@@ -1431,33 +1470,34 @@ const card = (
     "FD"
   );
 
+const hasArabic =
+  /[\u0600-\u06FF]/.test(
+    value || ""
+  );
+
+if (hasArabic) {
   doc.setFont(
-    "helvetica",
+    "NotoNaskhArabic",
     "normal"
   );
-
-  doc.setTextColor(140);
-  doc.setFontSize(9);
-
-  doc.text(
-    label,
-    x + 4,
-    yPos + 7
-  );
-
+} else {
   doc.setFont(
     "helvetica",
     "bold"
   );
+}
 
-  doc.setTextColor(20);
-  doc.setFontSize(11);
+doc.setTextColor(20);
+doc.setFontSize(11);
 
-  doc.text(
-    value || "-",
-    x + 4,
-    yPos + 15
-  );
+doc.text(
+  value || "-",
+  hasArabic ? x + 74 : x + 4,
+  yPos + 15,
+  hasArabic
+    ? { align: "right" }
+    : undefined
+);
 };
 
 // CUSTOMER
