@@ -669,25 +669,62 @@ async function recheckAllWarranties() {
 
   try {
     const { data: warranties } =
-      await supabase
-        .from("warranties")
-        .select(
-          "id, roll_number"
-        );
-
-const { data: inventory } =
   await supabase
-    .from("roll_inventory")
-    .select("roll_number");
+    .from("warranties")
+    .select(
+      "id, roll_number, status, roll_status"
+    );
+
+let inventory: any[] = [];
+
+const pageSize = 1000;
+let from = 0;
+
+while (true) {
+  const { data, error } =
+    await supabase
+      .from("roll_inventory")
+      .select("id, roll_number, roll_status")
+      .range(
+        from,
+        from + pageSize - 1
+      );
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    break;
+  }
+
+  inventory = [
+    ...inventory,
+    ...data,
+  ];
+
+  if (data.length < pageSize) {
+    break;
+  }
+
+  from += pageSize;
+}
+
+const normalizeRollNumber = (
+  value: unknown
+) =>
+  String(value || "")
+    .trim()
+    .replace(/\s+/g, "");
 
 const inventorySet =
   new Set(
-    inventory?.map(
+    inventory.map(
       (item) =>
-        String(
+        normalizeRollNumber(
           item.roll_number
-        ).trim()
-    ) || []
+        )
+    )
   );
 
     if (!warranties) {
@@ -696,13 +733,50 @@ const inventorySet =
     }
 
     for (const warranty of warranties) {
+
     const matched =
   inventorySet.has(
-    String(
+    normalizeRollNumber(
       warranty.roll_number
-    ).trim()
+    )
+  );
+const normalizedWarrantyRoll =
+  normalizeRollNumber(
+    warranty.roll_number
   );
 
+const inventoryItem =
+  inventory.find(
+    (item) =>
+      normalizeRollNumber(
+        item.roll_number
+      ) ===
+      normalizedWarrantyRoll
+  );
+
+if (
+  matched &&
+  inventoryItem &&
+  warranty.status !== "Cancelled" &&
+  warranty.roll_status !== "Released" &&
+  inventoryItem.roll_status !== "Released" &&
+  inventoryItem.roll_status !== "Used"
+) {
+  const { error: rollUpdateError } =
+    await supabase
+      .from("roll_inventory")
+      .update({
+        roll_status: "Used",
+      })
+      .eq(
+        "id",
+        inventoryItem.id
+      );
+
+  if (rollUpdateError) {
+    throw rollUpdateError;
+  }
+}
 
 
       await supabase
