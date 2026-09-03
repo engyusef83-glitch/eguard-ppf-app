@@ -578,8 +578,7 @@ async function loadInventoryReport() {
 )
       .order("id", {
         ascending: false,
-      })
-      .limit(20);
+      });
 
   setInventoryReport(
     data || []
