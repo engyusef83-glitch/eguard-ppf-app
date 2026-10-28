@@ -249,7 +249,7 @@ async function updateMode(
         roll_verification_mode:
           value,
       })
-      .eq("id", 1);
+      .eq("id", 2);
 
   if (error) {
     console.error(error);

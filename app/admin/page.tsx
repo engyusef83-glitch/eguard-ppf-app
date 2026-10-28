@@ -364,6 +364,12 @@ setSaving(true);
 );
 
     if (!product) {
+  alert(
+    language === "ar"
+      ? "يرجى اختيار نوع منتج صحيح قبل إضافة الضمان."
+      : "Please select a valid product before adding the warranty."
+  );
+
   setSaving(false);
   return;
 }
@@ -399,14 +405,28 @@ const { data: inventoryRoll } =
 const inventoryMatch =
   !!inventoryRoll;
 
-const { data: settings } =
+const { data: settings, error: settingsError } =
   await supabase
     .from("system_settings")
-    .select(
-      "roll_verification_mode"
-    )
-    .eq("id", 1)
+    .select("roll_verification_mode")
+    .eq("id", 2)
     .single();
+
+if (settingsError || !settings) {
+  console.error(
+    "VERIFICATION SETTINGS ERROR:",
+    settingsError
+  );
+
+  alert(
+    language === "ar"
+      ? "تعذر قراءة إعدادات التحقق من الرولات. يرجى المحاولة مرة أخرى."
+      : "Unable to load roll verification settings. Please try again."
+  );
+
+  setSaving(false);
+  return;
+}
 
 const verificationMode =
   settings?.roll_verification_mode ||
@@ -417,9 +437,11 @@ if (
   !inventoryMatch
 ) {
   alert(
-    "❌ Roll Number not found in Inventory.\n\nWarranty creation blocked by Strict Mode."
-  );
-
+  language === "ar"
+    ? "❌ رقم الرولة غير موجود في سجل الرولات المستوردة.\n\nلا يمكن إصدار الضمان لأن وضع التحقق الصارم مفعّل."
+    : "❌ Roll Number not found in Inventory.\n\nWarranty creation blocked by Strict Mode."
+);
+  setSaving(false);
   return;
 }
 
@@ -427,14 +449,17 @@ if (
   verificationMode === "warning" &&
   !inventoryMatch
 ) {
-  const proceed =
-    confirm(
-      "⚠️ Roll Number not found in Inventory.\n\nDo you want to continue creating the warranty?"
-    );
+
+  const proceed = window.confirm(
+  language === "ar"
+    ? "⚠️ رقم الرولة غير موجود في سجل الرولات المستوردة.\n\nهل ترغب بالاستمرار في إصدار الضمان؟"
+    : "⚠️ Roll Number not found in Inventory.\n\nDo you want to continue creating the warranty?"
+);
 
   if (!proceed) {
-    return;
-  }
+  setSaving(false);
+  return;
+}
 }
 
 const { data: existingRoll } =
@@ -457,7 +482,7 @@ if (
   alert(
     "❌ This roll is already used."
   );
-
+  setSaving(false)
   return;
 }
 
